@@ -1,0 +1,45 @@
+{
+    "name": "heymoon/mvt-tools",
+    "version": "1.0.0",
+    "description": "Serve or write Mapbox Vector Tile 2.1",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["vt-pbf"],
+    "autoload": {
+        "psr-4": {
+            "HeyMoon\\MVTTools\\": "src/",
+            "": "proto/gen"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HeyMoon\\MVTTools\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Egor",
+            "email": "me@heymoon.cc",
+            "homepage": "https://heymoon.cc"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "brick/geo": "^0.8.1",
+        "ext-zlib": "*"
+    },
+    "require-dev": {
+        "google/protobuf": "^3.21",
+        "phpunit/phpunit": "^9.5",
+        "meyfa/php-svg": "^0.11.3"
+    },
+    "suggest": {
+        "meyfa/php-svg": "Export MVT to SVG",
+        "ext-geos": "Update tiles with the best performance"
+    },
+    "scripts": {
+        "pre-autoload-dump": [
+            "protoc --proto_path=./proto --php_out=./proto/gen ./proto/vector_tile.proto"
+        ]
+    }
+}
