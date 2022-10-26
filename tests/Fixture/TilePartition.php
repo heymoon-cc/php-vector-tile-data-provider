@@ -24,6 +24,7 @@ class TilePartition
      * @throws GeometryIOException
      * @throws InvalidGeometryException
      * @throws UnexpectedGeometryException
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public static function load(string $fixture): static
     {

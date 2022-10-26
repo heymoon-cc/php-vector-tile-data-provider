@@ -29,14 +29,13 @@ class GridService
      * @throws EmptyGeometryException
      * @throws InvalidGeometryException
      * @throws UnexpectedGeometryException
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getGrid(Source $source, int $zoom, ?callable $filter = null): Grid
     {
         $grid = [];
-        $tileWidth = WebMercatorProjection::EARTH_RADIUS * 2;
-        foreach ($zoom >= 1 ? range(1, $zoom) : [] as $ignored) {
-            $tileWidth *= 0.5;
-        }
+        $tileWidth = GeometryHelper::getTileWidth($zoom);
         foreach ($this->spatialService->check($source->getShapes(), WebMercatorProjection::SRID) as $shape) {
             if ($shape->getMinZoom() > $zoom) {
                 continue;

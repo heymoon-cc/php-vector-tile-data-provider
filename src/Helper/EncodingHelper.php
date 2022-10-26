@@ -2,6 +2,9 @@
 
 namespace HeyMoon\MVTTools\Helper;
 
+/**
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
 class EncodingHelper
 {
     public static function getOriginalOrGZIP(string $data): bool|string

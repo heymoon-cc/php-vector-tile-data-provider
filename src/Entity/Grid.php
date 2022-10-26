@@ -2,6 +2,9 @@
 
 namespace HeyMoon\MVTTools\Entity;
 
+/**
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
 class Grid
 {
     public function __construct(
@@ -9,6 +12,10 @@ class Grid
         private readonly array $data
     ) {}
 
+    /**
+     * @param callable $callback
+     * @return $this
+     */
     public function iterate(callable $callback): self
     {
         foreach ($this->data as $key => $item) {

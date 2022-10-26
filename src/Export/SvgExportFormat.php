@@ -38,46 +38,46 @@ class SvgExportFormat extends AbstractExportFormat
                     $point = new SVGCircle($x, $y, $extent / 500);
                     $point->setStyle('fill', $stroke);
                     $doc->addChild($point);
-                } else {
-                    $path = '';
-                    $command = null;
-                    $n = null;
-                    $count = 0;
-                    for ($i = 0; $i <= $feature->getGeometry()->count(); $i++) {
-                        if (!$feature->getGeometry()->offsetExists($i)) {
-                            break;
-                        }
-                        $item = $feature->getGeometry()->offsetGet($i);
-                        if (!$command) {
-                            list($commandCode, $n) = $service->decodeCommand(
-                                $item
-                            );
-                            $command = match ($commandCode) {
-                                TileService::MOVE_TO => 'M',
-                                TileService::LINE_TO => 'l',
-                                TileService::CLOSE_PATH => 'z'
-                            };
-                            $count = 0;
-                            continue;
-                        }
-                        $i++;
-                        if (!$feature->getGeometry()->offsetExists($i)) {
-                            break;
-                        }
-                        $x = $service->decodeValue($item);
-                        $y = $service->decodeValue($feature->getGeometry()->offsetGet($i));
-                        $path .= " $command $x,$y";
-                        $count++;
-                        if ($count >= $n) {
-                            $command = null;
-                        }
-                    }
-                    $line = new SVGPath(substr($path, 1));
-                    $line->setStyle('stroke', $stroke);
-                    $line->setStyle('stroke-width', $extent / 500);
-                    $line->setStyle('fill', $feature->getType() === Tile\GeomType::LINESTRING ? 'none' : $stroke);
-                    $doc->addChild($line);
+                    continue;
                 }
+                $path = '';
+                $command = null;
+                $n = null;
+                $count = 0;
+                for ($i = 0; $i <= $feature->getGeometry()->count(); $i++) {
+                    if (!$feature->getGeometry()->offsetExists($i)) {
+                        break;
+                    }
+                    $item = $feature->getGeometry()->offsetGet($i);
+                    if (!$command) {
+                        list($commandCode, $n) = $service->decodeCommand(
+                            $item
+                        );
+                        $command = match ($commandCode) {
+                            TileService::MOVE_TO => 'M',
+                            TileService::LINE_TO => 'l',
+                            TileService::CLOSE_PATH => 'z'
+                        };
+                        $count = 0;
+                        continue;
+                    }
+                    $i++;
+                    if (!$feature->getGeometry()->offsetExists($i)) {
+                        break;
+                    }
+                    $x = $service->decodeValue($item);
+                    $y = $service->decodeValue($feature->getGeometry()->offsetGet($i));
+                    $path .= " $command $x,$y";
+                    $count++;
+                    if ($count >= $n) {
+                        $command = null;
+                    }
+                }
+                $line = new SVGPath(substr($path, 1));
+                $line->setStyle('stroke', $stroke);
+                $line->setStyle('stroke-width', $extent / 500);
+                $line->setStyle('fill', $feature->getType() === Tile\GeomType::LINESTRING ? 'none' : $stroke);
+                $doc->addChild($line);
             }
         }
         return $image;

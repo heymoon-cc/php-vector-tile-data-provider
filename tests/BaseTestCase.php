@@ -76,6 +76,9 @@ abstract class BaseTestCase extends TestCase
         return new GeoJSONReader();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
     protected function getFixture(string $name): string
     {
         return EncodingHelper::getOriginalOrGZIP(file_get_contents(__DIR__."/fixtures/$name"));

@@ -11,6 +11,9 @@ use Brick\Geo\Polygon;
 use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
 use HeyMoon\MVTTools\Entity\TilePosition;
 
+/**
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
 class GeometryHelper
 {
     private static array $grids = [];

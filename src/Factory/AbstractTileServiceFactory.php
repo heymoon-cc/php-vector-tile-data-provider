@@ -9,10 +9,8 @@ use HeyMoon\MVTTools\Service\TileService;
 
 abstract class AbstractTileServiceFactory
 {
-    public function __construct(
-        private ?GeometryEngine $engine = null,
-        private ?SpatialService $spatial = null
-    ) {}
+    private ?GeometryEngine $engine = null;
+    private ?SpatialService $spatial = null;
 
     public function getTileService(...$args): TileService
     {

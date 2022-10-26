@@ -10,6 +10,9 @@ use Brick\Geo\Polygon;
 use HeyMoon\MVTTools\Helper\GeometryHelper;
 use Stringable;
 
+/**
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
 class TilePosition implements Stringable
 {
     private static array $registry = [];
@@ -121,27 +124,46 @@ class TilePosition implements Stringable
         ]);
     }
 
-    public static function parse(string $data, bool $flipRow = false): static
+    public static function parse(string $data): static
     {
         parse_str($data, $parsed);
-        return static::xyz($parsed['c'], $parsed['r'], $parsed['z'], $flipRow);
+        return static::xyz($parsed['c'], $parsed['r'], $parsed['z']);
     }
 
-    public static function xyz(int $x, int $y, int $z, bool $flipRow = false): static
+    public static function parseFlip(string $data): static
     {
-        $new = new static($x, $flipRow ? (new static($x, $y, $z))->flipRow() : $y, $z);
+        parse_str($data, $parsed);
+        return static::xyzFlip($parsed['c'], $parsed['r'], $parsed['z']);
+    }
+
+    public static function xyz(int $x, int $y, int $z): static
+    {
+        $new = new static($x, $y, $z);
         if (!array_key_exists($z, static::$registry)) {
             static::$registry[$z] = [];
         }
         return static::$registry[$z][$new->getKey()] ?? (static::$registry[$z][$new->getKey()] = $new);
     }
 
-    public static function key(int $key, int $zoom, bool $flipRow = false): TilePosition
+    public static function xyzFlip(int $x, int $y, int $z): static
+    {
+        return static::xyz($x, (new static($x, $y, $z))->flipRow(), $z);
+    }
+
+    public static function key(int $key, int $zoom): TilePosition
     {
         $dimensions = GeometryHelper::getGridSize($zoom);
         $column = $dimensions ? floor($key / $dimensions) : 0;
         $row = $dimensions ? $key % $dimensions : 0;
-        return static::xyz($column, $row, $zoom, $flipRow);
+        return static::xyz($column, $row, $zoom);
+    }
+
+    public static function keyFlip(int $key, int $zoom): TilePosition
+    {
+        $dimensions = GeometryHelper::getGridSize($zoom);
+        $column = $dimensions ? floor($key / $dimensions) : 0;
+        $row = $dimensions ? $key % $dimensions : 0;
+        return static::xyzFlip($column, $row, $zoom);
     }
 
     public static function clearRegistry(): int

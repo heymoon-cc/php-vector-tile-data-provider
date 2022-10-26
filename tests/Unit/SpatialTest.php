@@ -15,13 +15,28 @@ class SpatialTest extends BaseTestCase
 {
     /**
      * Reference values from https://epsg.io/transform#s_srs=4326&t_srs=3857&x=37&y=55
-     * @covers SpatialService::transform
-     * @covers AbstractProjection::toWGS84
-     * @covers AbstractProjection::fromWGS84
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::transform
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::toWGS84
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::fromWGS84
+     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::__construct
+     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::addProjection
+     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::get
+     * @covers \HeyMoon\MVTTools\Registry\BasicProjectionRegistry::supports
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::__construct
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::transformPoint
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::__construct
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::get
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::getSRID
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::isAligned
+     * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::latitudeFromWGS84
+     * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::latitudeToWGS84
+     * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::longitudeFromWGS84
+     * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::longitudeToWGS84
      * @throws CoordinateSystemException
      * @throws UnexpectedGeometryException
      * @throws EmptyGeometryException
      * @throws InvalidGeometryException
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function testSpatial()
     {

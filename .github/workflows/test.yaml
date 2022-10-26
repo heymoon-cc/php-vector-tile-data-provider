@@ -6,10 +6,17 @@ jobs:
     runs-on: Linux
     steps:
       - uses: actions/checkout@v3
-      - run: make junit
+      - run: make composer
+      - run: make audit
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: mikepenz/action-junit-report@v3
         with:
-          name: PHPUnit result
-          path: junit/junit.xml
+          report_paths: test-reports/tests.xml
+      - name: Upload coverage results
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: test-reports/coverage.xml
+          badge: true
+      - name: PHPMD
+        run: make phpmd
       - run: make clean

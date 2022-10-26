@@ -13,12 +13,22 @@ image: cache
 push: image
 	docker push heymoon/mvt-tools-tester
 
-junit:
-	docker run -v $$(pwd)/src:/code/src -v $$(pwd)/tests:/code/tests -v $$(pwd)/junit:/code/junit \
-		heymoon/mvt-tools-tester --log-junit=/code/junit/junit.xml
+composer:
+	docker run -v $$(pwd):/code heymoon/mvt-tools-tester install
+
+audit:
+	docker run -v $$(pwd):/code heymoon/mvt-tools-tester test
+
+phpmd:
+	docker run -v $$(pwd):/code heymoon/mvt-tools-tester phpmd
 
 clean:
 	docker image rm php:8.1-alpine3.16 2> /dev/null || true  && \
 	docker image rm composer 2> /dev/null || true && \
 	docker image rm heymoon/mvt-tools-tester 2> /dev/null || true && \
-	(rm -rf junit 2> /dev/null || sudo rm -rf junit)
+	(rm -rf "test-reports" 2> /dev/null || sudo rm -rf "test-reports" || true) && \
+	(rm -rf vendor 2> /dev/null || sudo rm -rf vendor || true) && \
+	(rm -rf .phpunit.cache 2> /dev/null || sudo rm -rf .phpunit.cache 2> /dev/null || true) && \
+	(rm -rf proto/gen/Vector_tile 2> /dev/null || sudo rm -rf proto/gen/Vector_tile 2> /dev/null || true) && \
+	(rm -rf proto/gen/GPBMetadata 2> /dev/null || sudo rm -rf proto/gen/GPBMetadata 2> /dev/null || true)
+

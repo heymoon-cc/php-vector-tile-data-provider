@@ -17,11 +17,7 @@ class Shape implements Stringable
         ?string                   $uuid = null
     )
     {
-        if ($uuid) {
-            $this->uuid = $uuid;
-        } else {
-            $this->uuid = uniqid();
-        }
+        $this->uuid = $uuid ?? uniqid();
     }
 
     /**

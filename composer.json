@@ -1,6 +1,6 @@
 {
     "name": "heymoon/mvt-tools",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Serve or write Mapbox Vector Tile 2.1",
     "type": "library",
     "license": "MIT",
@@ -31,7 +31,8 @@
     "require-dev": {
         "google/protobuf": "^3.21",
         "phpunit/phpunit": "^9.5",
-        "meyfa/php-svg": "^0.11.3"
+        "meyfa/php-svg": "^0.11.3",
+        "phpmd/phpmd": "^2.13"
     },
     "suggest": {
         "meyfa/php-svg": "Export MVT to SVG",
@@ -40,6 +41,12 @@
     "scripts": {
         "pre-autoload-dump": [
             "protoc --proto_path=./proto --php_out=./proto/gen ./proto/vector_tile.proto"
+        ],
+        "test": [
+            "phpunit --log-junit=test-reports/tests.xml --coverage-cobertura=test-reports/coverage.xml --no-interaction"
+        ],
+        "phpmd": [
+            "phpmd src github cleancode"
         ]
     }
 }

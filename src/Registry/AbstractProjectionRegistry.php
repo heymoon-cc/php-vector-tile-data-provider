@@ -6,6 +6,9 @@ use HeyMoon\MVTTools\Spatial\SpatialProjectionInterface;
 use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
 use HeyMoon\MVTTools\Spatial\WorldGeodeticProjection;
 
+/**
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
 abstract class AbstractProjectionRegistry
 {
     private array $projections = [];

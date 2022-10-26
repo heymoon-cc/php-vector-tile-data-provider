@@ -3,4 +3,4 @@ vendor
 composer.lock
 proto/gen
 .phpunit.cache
-junit
+test-reports

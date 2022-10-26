@@ -20,10 +20,53 @@ use HeyMoon\MVTTools\Entity\Source;
 use HeyMoon\MVTTools\Entity\TilePosition;
 use Vector_tile\Tile;
 
+/**
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
 class TileTest extends BaseTestCase
 {
     /**
-     * @covers TileService::getTileMVT
+     * @covers \HeyMoon\MVTTools\Service\TileService::getTileMVT
+     * @covers \HeyMoon\MVTTools\Entity\Layer::__construct
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getName
+     * @covers \HeyMoon\MVTTools\Entity\Shape::__construct
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getGeometry
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getLayer
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getParameters
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::__construct
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getBorder
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getColumn
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getGridSize
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getKey
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getRow
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getTileWidth
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getZoom
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::key
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::xyz
+     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getEngine
+     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getSpatialService
+     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getTileService
+     * @covers \HeyMoon\MVTTools\Factory\GEOSTileServiceFactory::createEngine
+     * @covers \HeyMoon\MVTTools\Helper\EncodingHelper::getOriginalOrGZIP
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getBounds
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getGridSize
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getLineBounds
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getTileBorder
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getTileWidth
+     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::__construct
+     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::addProjection
+     * @covers \HeyMoon\MVTTools\Registry\BasicProjectionRegistry::supports
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::__construct
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::check
+     * @covers \HeyMoon\MVTTools\Service\TileService::__construct
+     * @covers \HeyMoon\MVTTools\Service\TileService::addValues
+     * @covers \HeyMoon\MVTTools\Service\TileService::createLayer
+     * @covers \HeyMoon\MVTTools\Service\TileService::encodeCommand
+     * @covers \HeyMoon\MVTTools\Service\TileService::encodeValue
+     * @covers \HeyMoon\MVTTools\Service\TileService::simplify
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::__construct
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::get
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::getSRID
      * @throws CoordinateSystemException
      * @throws GeometryIOException
      * @throws InvalidGeometryException
@@ -42,7 +85,63 @@ class TileTest extends BaseTestCase
     }
 
     /**
-     * @covers TileService::getTileMVT
+     * @covers \HeyMoon\MVTTools\Service\TileService::getTileMVT
+     * @covers \HeyMoon\MVTTools\Entity\Layer::__construct
+     * @covers \HeyMoon\MVTTools\Entity\Layer::add
+     * @covers \HeyMoon\MVTTools\Entity\Layer::addCollection
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getName
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getShapes
+     * @covers \HeyMoon\MVTTools\Entity\Shape::__construct
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getGeometry
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getLayer
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getParameters
+     * @covers \HeyMoon\MVTTools\Entity\Shape::setGeometry
+     * @covers \HeyMoon\MVTTools\Entity\Source::addCollection
+     * @covers \HeyMoon\MVTTools\Entity\Source::getLayer
+     * @covers \HeyMoon\MVTTools\Entity\Source::getShapes
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::__construct
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getBorder
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getColumn
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getGridSize
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getKey
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getRow
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getTileWidth
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getZoom
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::xyz
+     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getEngine
+     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getSpatialService
+     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getTileService
+     * @covers \HeyMoon\MVTTools\Factory\GEOSTileServiceFactory::createEngine
+     * @covers \HeyMoon\MVTTools\Helper\EncodingHelper::getOriginalOrGZIP
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getBounds
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getGridSize
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getLineBounds
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getTileBorder
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getTileWidth
+     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::__construct
+     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::addProjection
+     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::get
+     * @covers \HeyMoon\MVTTools\Registry\BasicProjectionRegistry::supports
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::__construct
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::check
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::transform
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::transformLine
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::transformMultiPolygon
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::transformPoint
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::transformPolygon
+     * @covers \HeyMoon\MVTTools\Service\TileService::__construct
+     * @covers \HeyMoon\MVTTools\Service\TileService::addValues
+     * @covers \HeyMoon\MVTTools\Service\TileService::createLayer
+     * @covers \HeyMoon\MVTTools\Service\TileService::encodeCommand
+     * @covers \HeyMoon\MVTTools\Service\TileService::encodeValue
+     * @covers \HeyMoon\MVTTools\Service\TileService::simplify
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::__construct
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::fromWGS84
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::get
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::getSRID
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::isAligned
+     * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::latitudeFromWGS84
+     * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::longitudeFromWGS84
      * @throws GeometryException
      */
     public function testPolygons()
@@ -59,7 +158,25 @@ class TileTest extends BaseTestCase
     }
 
     /**
-     * @covers TileService::mergeLayers
+     * @covers \HeyMoon\MVTTools\Service\TileService::mergeLayers
+     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getEngine
+     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getSpatialService
+     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getTileService
+     * @covers \HeyMoon\MVTTools\Factory\GEOSTileServiceFactory::createEngine
+     * @covers \HeyMoon\MVTTools\Factory\TileFactory::parse
+     * @covers \HeyMoon\MVTTools\Helper\EncodingHelper::getOriginalOrGZIP
+     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::__construct
+     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::addProjection
+     * @covers \HeyMoon\MVTTools\Registry\BasicProjectionRegistry::supports
+     * @covers \HeyMoon\MVTTools\Service\SpatialService::__construct
+     * @covers \HeyMoon\MVTTools\Service\TileService::__construct
+     * @covers \HeyMoon\MVTTools\Service\TileService::addValues
+     * @covers \HeyMoon\MVTTools\Service\TileService::createLayer
+     * @covers \HeyMoon\MVTTools\Service\TileService::getExtent
+     * @covers \HeyMoon\MVTTools\Service\TileService::getValues
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::__construct
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::get
+     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::getSRID
      * @throws Exception
      */
     public function testMerge()
@@ -76,11 +193,29 @@ class TileTest extends BaseTestCase
     }
 
     /**
-     * @covers TilePosition::flipRow
-     * @covers TilePosition::getBounds
-     * @covers TilePosition::getMinPoint
-     * @covers TilePosition::getMaxPoint
-     * @covers GeometryHelper::getGridSize
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::flipRow
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::__construct
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::__toString
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::clearRegistry
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getBorder
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getBounds
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getColumn
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getGridSize
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getKey
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getMaxPoint
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getMinPoint
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getRow
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getTileWidth
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::getZoom
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::key
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::parseFlip
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::xyz
+     * @covers \HeyMoon\MVTTools\Entity\TilePosition::xyzFlip
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getBounds
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getGridSize
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getLineBounds
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getTileBorder
+     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getTileWidth
      * @throws EmptyGeometryException
      * @throws CoordinateSystemException
      * @throws InvalidGeometryException
@@ -92,7 +227,7 @@ class TileTest extends BaseTestCase
         $this->assertEquals(1, $position->getRow());
         $this->assertEquals(1, $position->getKey());
         $this->assertEquals((string)$position, (string)TilePosition::key($position->getKey(), $position->getZoom()));
-        $this->assertEquals(0, TilePosition::parse($position, true)->getRow());
+        $this->assertEquals(0, TilePosition::parseFlip($position)->getRow());
         $this->assertPoint(Point::xy(WebMercatorProjection::EARTH_RADIUS * -1, 0), $position->getMinPoint());
         $this->assertPoint(Point::xy(0, WebMercatorProjection::EARTH_RADIUS), $position->getMaxPoint());
         $this->assertEquals(2, TilePosition::clearRegistry());

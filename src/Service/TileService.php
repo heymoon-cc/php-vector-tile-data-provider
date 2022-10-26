@@ -26,6 +26,9 @@ use HeyMoon\MVTTools\Entity\Shape;
 use HeyMoon\MVTTools\Entity\TilePosition;
 use Vector_tile\Tile;
 
+/**
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
 class TileService
 {
     public const DEFAULT_EXTENT = 4096;
@@ -40,6 +43,9 @@ class TileService
 
     private array $valuesCache = [];
 
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
     public function __construct(
         private readonly GeometryEngine $geometryEngine,
         private readonly SpatialService $spatialService,
@@ -58,6 +64,7 @@ class TileService
      * @throws GeometryEngineException
      * @throws UnexpectedGeometryException
      * @throws InvalidGeometryException
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function getTileMVT(
         array $shapes,
@@ -324,6 +331,7 @@ class TileService
      * @throws GeometryEngineException
      * @throws EmptyGeometryException
      * @throws InvalidGeometryException
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected function simplify(Layer $layer, array $data, float $tolerance): array
     {
@@ -399,6 +407,9 @@ class TileService
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
     protected function addValues(array $parameters, array &$keys, array &$values): array
     {
         $new = array_keys($parameters);

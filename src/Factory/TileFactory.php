@@ -6,6 +6,9 @@ use Exception;
 use HeyMoon\MVTTools\Helper\EncodingHelper;
 use Vector_tile\Tile;
 
+/**
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
 class TileFactory
 {
     /**

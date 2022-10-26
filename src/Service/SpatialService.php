@@ -19,6 +19,9 @@ use HeyMoon\MVTTools\Exception\SpatialSystemEncodeException;
 use HeyMoon\MVTTools\Registry\AbstractProjectionRegistry;
 use HeyMoon\MVTTools\Spatial\WorldGeodeticProjection;
 
+/**
+ * @SuppressWarnings(PHPMD.StaticAccess)
+ */
 class SpatialService
 {
     public function __construct(private readonly AbstractProjectionRegistry $projectionRegistry) {}
