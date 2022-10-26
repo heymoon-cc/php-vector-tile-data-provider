@@ -1,14 +1,14 @@
 name: Build
 run-name: ${{ github.actor }} is building heymoon/mvt-tools-tester image
 on:
+  workflow_dispatch: {}
   push:
     paths:
       - Dockerfile
-      - .dockerignore
 jobs:
   build:
     name: Build
     runs-on: Linux
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v1
       - run: make push && make clean

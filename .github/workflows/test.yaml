@@ -1,11 +1,15 @@
 name: Test
 run-name: ${{ github.actor }} is testing heymoon/mvt-tools
-on: workflow_dispatch
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - Dockerfile
 jobs:
   test:
     runs-on: Linux
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v1
       - run: make composer
       - run: make audit
       - name: Upload test results
@@ -13,10 +17,12 @@ jobs:
         with:
           report_paths: test-reports/tests.xml
       - name: Upload coverage results
-        uses: irongut/CodeCoverageSummary@v1.3.0
+        uses: paambaati/codeclimate-action@v3.2.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CodeClimateToken }}
         with:
-          filename: test-reports/coverage.xml
-          badge: true
+          coverageLocations: ${{ github.workspace }}/test-reports/coverage.xml:cobertura
+          workingDirectory: ${{ github.workspace }}/src
       - name: PHPMD
         run: make phpmd
       - run: make clean

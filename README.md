@@ -1,4 +1,9 @@
 # Mapbox vector tiles render library for PHP
+[![PHP Version Require](http://poser.pugx.org/heymoon/mvt-tools/v)](https://packagist.org/packages/heymoon/mvt-tools)
+[![PHP Version Require](http://poser.pugx.org/heymoon/mvt-tools/require/php)](https://packagist.org/packages/heymoon/mvt-tools)
+[![Test](https://github.com/egbuk/mvt-tools/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/egbuk/mvt-tools/actions/workflows/test.yaml)
+[![Maintainability](https://api.codeclimate.com/v1/badges/223376b2050d8c0af9e1/maintainability)](https://codeclimate.com/github/egbuk/mvt-tools/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/223376b2050d8c0af9e1/test_coverage)](https://codeclimate.com/github/egbuk/mvt-tools/test_coverage)
 
 Serve or write [Mapbox Vector Tile 2.1](https://github.com/mapbox/vector-tile-spec/tree/master/2.1) using PHP 8.1 
 with Douglas-Peucker simplification and intersection check implementation from
