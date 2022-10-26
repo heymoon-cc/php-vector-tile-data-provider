@@ -3,3 +3,4 @@ vendor
 composer.lock
 proto/gen
 .phpunit.cache
+junit
