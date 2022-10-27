@@ -5,19 +5,26 @@ namespace HeyMoon\MVTTools\Entity;
 use Brick\Geo\Geometry;
 use Stringable;
 
-class Shape implements Stringable
+class Shape extends AbstractFeatureIdHolder implements Stringable
 {
-    private string $uuid;
+    private int $id;
 
     public function __construct(
         private readonly Layer    $layer,
         private Geometry $geometry,
         private readonly array    $parameters = [],
         private readonly int      $minZoom = 0,
-        ?string                   $uuid = null
-    )
+        ?int $id = null
+    ) {
+        $this->id = $this->layer->getSource()->addFeature($this, $id);
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
-        $this->uuid = $uuid ?? uniqid();
+        return $this->id;
     }
 
     /**
@@ -47,7 +54,7 @@ class Shape implements Stringable
      */
     public function getParameters(): array
     {
-        return $this->parameters;
+        return array_diff_key($this->parameters, ['id' => $this->id]);
     }
 
     public function getParameter($key): mixed
@@ -65,6 +72,6 @@ class Shape implements Stringable
 
     public function __toString(): string
     {
-        return $this->uuid;
+        return (string)$this->id;
     }
 }

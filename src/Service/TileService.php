@@ -9,6 +9,7 @@ use Brick\Geo\Exception\EmptyGeometryException;
 use Brick\Geo\Exception\GeometryEngineException;
 use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
+use Brick\Geo\Geometry;
 use Brick\Geo\GeometryCollection;
 use Brick\Geo\LineString;
 use Brick\Geo\MultiLineString;
@@ -19,6 +20,7 @@ use Brick\Geo\Polygon;
 use Brick\Geo\Surface;
 use ErrorException;
 use Exception;
+use HeyMoon\MVTTools\Entity\Source;
 use HeyMoon\MVTTools\Helper\GeometryHelper;
 use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
 use HeyMoon\MVTTools\Entity\Layer;
@@ -111,6 +113,7 @@ class TileService
                 }
                 foreach ($geometries as $geometry) {
                     $feature = new Tile\Feature();
+                    $feature->setId($item->getId());
                     $closePath = false;
                     $points = [];
                     try {
@@ -243,7 +246,8 @@ class TileService
                     $parameters = $this->getValues($layer, $feature);
                     $tags = $this->addValues($parameters, $keys, $values);
                     $newFeature->setTags($tags);
-                    $newFeature->setType(Tile\GeomType::LINESTRING);
+                    $newFeature->setId($feature->getId());
+                    $newFeature->setType($feature->getType());
                     $newFeature->setGeometry($feature->getGeometry());
                     $features[] = $newFeature;
                 }
@@ -337,6 +341,8 @@ class TileService
     {
         $shapeByParameters = [];
         $parameters = [];
+        $idsByType = [];
+        /** @var Shape[] $parents */
         foreach ($data as $shape) {
             if (!$shape instanceof Shape) {
                 continue;
@@ -349,10 +355,14 @@ class TileService
                 $shapeByParameters[$key] = [];
             }
             foreach ($geometry instanceof GeometryCollection ? $geometry->geometries() : [$geometry] as $item) {
+                if (!array_key_exists($item->geometryTypeBinary(), $idsByType)) {
+                    $idsByType[$item->geometryTypeBinary()] = [];
+                }
                 $shapeByParameters[$key][] = $item;
+                $idsByType[$item->geometryTypeBinary()][] = $shape->getId();
             }
         }
-        $result = [];
+        $result = (new Source())->getLayer($layer->getName());
         foreach ($shapeByParameters as $key => $shapes) {
             $currentParameters = $parameters[$key];
             $lines = [];
@@ -365,8 +375,13 @@ class TileService
                     $points[] = $shape;
                 } elseif ($shape instanceof Polygon) {
                     $polygons[] = $shape;
-                } else {
-                    $result[] = new Shape($layer, $shape, $currentParameters);
+                } elseif ($shape instanceof Geometry) {
+                    $result->add(
+                        $shape,
+                        $currentParameters,
+                        0,
+                        array_shift($idsByType[$shape->geometryTypeBinary()])
+                    );
                 }
             }
             $simplified = [];
@@ -400,11 +415,16 @@ class TileService
                             continue;
                         }
                     }
-                    $result[] = new Shape($layer, $item, $currentParameters);
+                    $result->add(
+                        $item,
+                        $currentParameters,
+                        0,
+                        array_shift($idsByType[$item->geometryTypeBinary()])
+                    );
                 }
             }
         }
-        return $result;
+        return $result->getShapes();
     }
 
     /**

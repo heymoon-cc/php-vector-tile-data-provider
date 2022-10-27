@@ -10,18 +10,22 @@ class Layer
 {
     private array $shapes = [];
 
-    public function __construct(private readonly string $name) {}
+    public function __construct(private readonly string $name, private readonly Source $source) {}
 
-    public function add(Geometry $geometry, array $properties): self
+    public function add(Geometry $geometry, array $properties, int $minZoom = 0, ?int $id = null): self
     {
-        $this->shapes[] = new Shape($this, $geometry, $properties);
+        $this->shapes[] = new Shape($this, $geometry, $properties, $minZoom, $id);
         return $this;
     }
 
-    public function addCollection(FeatureCollection $collection, int $srid = WorldGeodeticProjection::SRID): self
+    public function addCollection(
+        FeatureCollection $collection, int $minZoom = 0, int $srid = WorldGeodeticProjection::SRID
+    ): self
     {
         foreach ($collection->getFeatures() as $feature) {
-            $this->add($feature->getGeometry()->withSRID($srid), (array)$feature->getProperties());
+            $properties = (array)$feature->getProperties();
+            $id = $properties['id'] ?? null;
+            $this->add($feature->getGeometry()->withSRID($srid), $properties, $minZoom, $id);
         }
         return $this;
     }
@@ -40,5 +44,13 @@ class Layer
     public function getShapes(): array
     {
         return $this->shapes;
+    }
+
+    /**
+     * @return Source
+     */
+    public function getSource(): Source
+    {
+        return $this->source;
     }
 }

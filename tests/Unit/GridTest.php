@@ -62,6 +62,9 @@ class GridTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::isAligned
      * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::latitudeFromWGS84
      * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::longitudeFromWGS84
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getName
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getSource
+     * @covers \HeyMoon\MVTTools\Entity\Source::addFeature
      * @throws GeometryException
      * @throws CoordinateSystemException
      * @throws EmptyGeometryException

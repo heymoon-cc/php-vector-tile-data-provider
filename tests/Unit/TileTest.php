@@ -67,6 +67,12 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::__construct
      * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::get
      * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::getSRID
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getId
+     * @covers \HeyMoon\MVTTools\Entity\Layer::add
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getShapes
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getSource
+     * @covers \HeyMoon\MVTTools\Entity\Source::addFeature
+     * @covers \HeyMoon\MVTTools\Entity\Source::getLayer
      * @throws CoordinateSystemException
      * @throws GeometryIOException
      * @throws InvalidGeometryException
@@ -142,6 +148,9 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::isAligned
      * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::latitudeFromWGS84
      * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::longitudeFromWGS84
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getId
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getSource
+     * @covers \HeyMoon\MVTTools\Entity\Source::addFeature
      * @throws GeometryException
      */
     public function testPolygons()

@@ -8,6 +8,7 @@ use Brick\Geo\Exception\GeometryIOException;
 use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
+use HeyMoon\MVTTools\Entity\Source;
 use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
 use HeyMoon\MVTTools\Entity\Layer;
 use HeyMoon\MVTTools\Entity\Shape;
@@ -29,14 +30,16 @@ class TilePartition
     public static function load(string $fixture): static
     {
         $data = json_decode($fixture, true);
-        $layer = new Layer('test');
-        return new static(
-            TilePosition::key($data['key'], $data['zoom']),
-            array_map(fn (array $item) => new Shape(
-                $layer,
+        $layer = (new Source())->getLayer('test');
+        foreach ($data['data'] as $item) {
+            $layer->add(
                 Geometry::fromText($item['geometry'])->withSRID(WebMercatorProjection::SRID),
                 $item['parameters']
-            ), $data['data'])
+            );
+        }
+        return new static(
+            TilePosition::key($data['key'], $data['zoom']),
+            $layer->getShapes()
         );
     }
 

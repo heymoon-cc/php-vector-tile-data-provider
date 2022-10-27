@@ -6,25 +6,27 @@ use Brick\Geo\Geometry;
 use Brick\Geo\IO\GeoJSON\FeatureCollection;
 use HeyMoon\MVTTools\Spatial\WorldGeodeticProjection;
 
-class Source
+class Source extends AbstractFeatureIdHolder
 {
+    private array $features = [];
+
     private array $layers = [];
 
-    public function add(string $name, Geometry $geometry, array $properties): self
+    public function add(string $name, Geometry $geometry, array $properties, int $minZoom = 0, ?int $id = null): self
     {
-        $this->getLayer($name)->add($geometry, $properties);
+        $this->getLayer($name)->add($geometry, $properties, $minZoom);
         return $this;
     }
 
-    public function addCollection(string $name, FeatureCollection $collection, int $srid = WorldGeodeticProjection::SRID): self
+    public function addCollection(string $name, FeatureCollection $collection, int $minZoom = 0, int $srid = WorldGeodeticProjection::SRID): self
     {
-        $this->getLayer($name)->addCollection($collection, $srid);
+        $this->getLayer($name)->addCollection($collection, $minZoom, $srid);
         return $this;
     }
 
     public function getLayer(string $name): Layer
     {
-        return $this->layers[$name] ?? ($this->layers[$name] = new Layer($name));
+        return $this->layers[$name] ?? ($this->layers[$name] = new Layer($name, $this));
     }
 
     /**
@@ -32,6 +34,12 @@ class Source
      */
     public function getShapes(): array
     {
-        return array_merge(...array_map(fn(Layer $layer) => $layer->getShapes(), array_values($this->layers)));
+        return $this->features;
+    }
+
+    protected function addFeature(Shape $feature, ?int $id = null): int
+    {
+        $id ? $this->features[$id] = $feature : $this->features[] = $feature;
+        return array_key_last($this->features);
     }
 }

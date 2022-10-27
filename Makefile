@@ -29,6 +29,7 @@ clean:
 	(rm -rf "test-reports" 2> /dev/null || sudo rm -rf "test-reports" || true) && \
 	(rm -rf vendor 2> /dev/null || sudo rm -rf vendor || true) && \
 	(rm -rf .phpunit.cache 2> /dev/null || sudo rm -rf .phpunit.cache 2> /dev/null || true) && \
+	(rm -rf composer.lock 2> /dev/null || sudo rm -rf composer.lock 2> /dev/null || true) && \
 	(rm -rf proto/gen/Vector_tile 2> /dev/null || sudo rm -rf proto/gen/Vector_tile 2> /dev/null || true) && \
 	(rm -rf proto/gen/GPBMetadata 2> /dev/null || sudo rm -rf proto/gen/GPBMetadata 2> /dev/null || true)
 
