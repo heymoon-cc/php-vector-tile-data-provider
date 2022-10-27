@@ -13,6 +13,7 @@ use Brick\Geo\MultiPoint;
 use Brick\Geo\MultiPolygon;
 use Brick\Geo\Point;
 use Brick\Geo\Polygon;
+use HeyMoon\MVTTools\Entity\AbstractSourceComponent;
 use HeyMoon\MVTTools\Entity\Shape;
 use HeyMoon\MVTTools\Exception\SpatialSystemDecodeException;
 use HeyMoon\MVTTools\Exception\SpatialSystemEncodeException;
@@ -22,7 +23,7 @@ use HeyMoon\MVTTools\Spatial\WorldGeodeticProjection;
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)
  */
-class SpatialService
+class SpatialService extends AbstractSourceComponent
 {
     public function __construct(private readonly AbstractProjectionRegistry $projectionRegistry) {}
 
@@ -102,7 +103,7 @@ class SpatialService
         }
         return MultiPoint::of(
             ...array_map(fn(Point $point) => $this->transformPoint($point, $srid), $geometry->geometries())
-        );
+        )->withSRID($srid);
     }
 
     /**
@@ -114,7 +115,8 @@ class SpatialService
         if ($this->projectionRegistry->get($srid)->isAligned($line)) {
             return $line;
         }
-        return LineString::of(...array_map(fn (Point $point) => $this->transformPoint($point, $srid), $line->points()));
+        return LineString::of(...array_map(fn (Point $point) => $this->transformPoint($point, $srid), $line->points()))
+            ->withSRID($srid);
     }
 
     /**
@@ -128,8 +130,9 @@ class SpatialService
             return $geometry;
         }
         return MultiLineString::of(
-            ...array_map(fn (LineString $line) => $this->transformLine($line, $srid),$geometry->geometries())
-        );
+            ...array_map(fn (LineString $line) => $this->transformLine($line, $srid),
+                $geometry->geometries())
+        )->withSRID($srid);
     }
 
     /**
@@ -142,7 +145,8 @@ class SpatialService
         if ($this->projectionRegistry->get($srid)->isAligned($polygon)) {
             return $polygon;
         }
-        return Polygon::of($this->transformLine($polygon->exteriorRing(), $srid));
+        return Polygon::of($this->transformLine($polygon->exteriorRing(), $srid))
+            ->withSRID($srid);
     }
 
     /**
@@ -157,7 +161,9 @@ class SpatialService
             return $geometry;
         }
         return MultiPolygon::of(
-            ...array_map(fn (Polygon $polygon) => $this->transformPolygon($polygon, $srid), $geometry->geometries())
-        );
+            ...array_map(fn (Polygon $polygon) => $this->transformPolygon($polygon, $srid),
+                $geometry->geometries()
+            )
+        )->withSRID($srid);
     }
 }

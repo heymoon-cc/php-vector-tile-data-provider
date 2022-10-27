@@ -29,23 +29,25 @@ surface from WGS 84 to the required spatial system and the reverse transformatio
 ### DI configuration:
 ```yaml
 services:
-    Brick\Geo\Engine\GeometryEngine:
-      class: 'Brick\Geo\Engine\GEOSEngine'
-    HeyMoon\MVTTools\Registry\AbstractProjectionRegistry:
-      class: 'HeyMoon\MVTTools\Registry\BasicProjectionRegistry'
-    HeyMoon\MVTTools\Registry\AbstractExportFormatRegistry:
-      class: 'HeyMoon\MVTTools\Registry\ExportFormatRegistry'
-    HeyMoon\MVTTools\Service\SpatialService: ~
-    HeyMoon\MVTTools\Service\GridService: ~
-    HeyMoon\MVTTools\Service\TileService: ~
-    HeyMoon\MVTTools\Service\ExportService: ~
+  Brick\Geo\Engine\GeometryEngine:
+    class: 'Brick\Geo\Engine\GEOSEngine'
+  HeyMoon\MVTTools\Factory\GeometryCollectionFactory: ~
+  HeyMoon\MVTTools\Factory\SourceFactory: ~
+  HeyMoon\MVTTools\Registry\AbstractProjectionRegistry:
+    class: 'HeyMoon\MVTTools\Registry\BasicProjectionRegistry'
+  HeyMoon\MVTTools\Registry\AbstractExportFormatRegistry:
+    class: 'HeyMoon\MVTTools\Registry\ExportFormatRegistry'
+  HeyMoon\MVTTools\Service\SpatialService: ~
+  HeyMoon\MVTTools\Service\GridService: ~
+  HeyMoon\MVTTools\Service\TileService: ~
+  HeyMoon\MVTTools\Service\ExportService: ~
 ```
 ### Action:
 ```php
 use Brick\Geo\IO\GeoJSONReader;
 use Brick\Geo\Exception\GeometryException;
-use HeyMoon\MVTTools\Entity\Source;
 use HeyMoon\MVTTools\Entity\TilePosition;
+use HeyMoon\MVTTools\Factory\SourceFactory;
 use HeyMoon\MVTTools\Service\GridService;
 use HeyMoon\MVTTools\Service\TileService;
 use HeyMoon\MVTTools\Service\ExportService;
@@ -61,6 +63,7 @@ class ExportCommand extends Command
 {
     public function __construct(
         private readonly GeoJSONReader $geoJSONReader,
+        private readonly SourceFactory $sourceFactory,
         private readonly GridService $gridService,
         private readonly TileService $tileService,
         private readonly ExportService $exportService
@@ -75,12 +78,12 @@ class ExportCommand extends Command
         $this->addArgument('out', InputArgument::REQUIRED);
         $this->addOption('zoom', 'z', InputOption::VALUE_OPTIONAL);
         $this->addOption('type', 't', InputOption::VALUE_OPTIONAL,
-            'mvt for .mvt (alias pbf/.pbf) or svg for .svg');
+            'mvt for .mvt or svg for .svg');
     }
 
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $source = new Source();
+        $source = $this->sourceFactory->create();
         try {
             $source->addCollection('export', $this->geoJSONReader->read(file_get_contents($input->getArgument('in'))));
             $grid = $this->gridService->getGrid($source, $input->getOption('zoom') ?? 0);
@@ -88,8 +91,7 @@ class ExportCommand extends Command
             $type = $input->getOption('t') ?? 'mvt';
             $grid->iterate(fn (TilePosition $position, array $data) =>
                 $this->exportService->dump(
-                    $this->tileService->getTileMVT($data, $position), "$path/$position.$type"
-                )
+                    $this->tileService->getTileMVT($data, $position), "$path/$position.$type")
             );
         } catch (GeometryException $e) {
             $output->writeln("Data error: {$e->getMessage()}");

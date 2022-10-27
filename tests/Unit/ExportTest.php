@@ -14,10 +14,10 @@ class ExportTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Export\AbstractExportFormat::isAvailable
      * @covers \HeyMoon\MVTTools\Export\SvgExportFormat::export
      * @covers \HeyMoon\MVTTools\Export\SvgExportFormat::getDependencyClass
-     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getEngine
-     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getSpatialService
-     * @covers \HeyMoon\MVTTools\Factory\AbstractTileServiceFactory::getTileService
-     * @covers \HeyMoon\MVTTools\Factory\GEOSTileServiceFactory::createEngine
+     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getEngine
+     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getSpatialService
+     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getTileService
+     * @covers \HeyMoon\MVTTools\Factory\GEOSServiceFactory::createEngine
      * @covers \HeyMoon\MVTTools\Factory\TileFactory::parse
      * @covers \HeyMoon\MVTTools\Helper\EncodingHelper::getOriginalOrGZIP
      * @covers \HeyMoon\MVTTools\Registry\AbstractExportFormatRegistry::get
@@ -34,6 +34,9 @@ class ExportTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::__construct
      * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::get
      * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::getSRID
+     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getSourceFactory
+     * @covers \HeyMoon\MVTTools\Factory\SourceFactory::__construct
+     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getGeometryCollectionFactory
      * @throws Exception
      */
     public function testExport()

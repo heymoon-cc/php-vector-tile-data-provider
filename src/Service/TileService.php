@@ -8,19 +8,19 @@ use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\EmptyGeometryException;
 use Brick\Geo\Exception\GeometryEngineException;
 use Brick\Geo\Exception\InvalidGeometryException;
+use Brick\Geo\Exception\NoSuchGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
+use Brick\Geo\Geometry;
 use Brick\Geo\GeometryCollection;
 use Brick\Geo\LineString;
-use Brick\Geo\MultiLineString;
-use Brick\Geo\MultiPoint;
-use Brick\Geo\MultiPolygon;
 use Brick\Geo\Point;
 use Brick\Geo\Polygon;
 use Brick\Geo\Surface;
 use ErrorException;
 use Exception;
+use HeyMoon\MVTTools\Factory\GeometryCollectionFactory;
+use HeyMoon\MVTTools\Factory\SourceFactory;
 use HeyMoon\MVTTools\Helper\GeometryHelper;
-use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
 use HeyMoon\MVTTools\Entity\Layer;
 use HeyMoon\MVTTools\Entity\Shape;
 use HeyMoon\MVTTools\Entity\TilePosition;
@@ -48,7 +48,8 @@ class TileService
      */
     public function __construct(
         private readonly GeometryEngine $geometryEngine,
-        private readonly SpatialService $spatialService,
+        private readonly SourceFactory $sourceFactory,
+        private readonly GeometryCollectionFactory $geometryCollectionFactory,
         private readonly float  $minTolerance = 0,
         private readonly bool $flip = true,
     ) {}
@@ -64,6 +65,7 @@ class TileService
      * @throws GeometryEngineException
      * @throws UnexpectedGeometryException
      * @throws InvalidGeometryException
+     * @throws NoSuchGeometryException
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function getTileMVT(
@@ -97,8 +99,7 @@ class TileService
         $bufferedBounds = $buffer ? $this->geometryEngine->buffer($border, $buffer) : $border;
         $tolerance = $width / $extent;
         $layers = [];
-        foreach ($byLayer as $name => $original) {
-            $data = $this->spatialService->check($original, WebMercatorProjection::SRID);
+        foreach ($byLayer as $name => $data) {
             foreach ($tolerance > $this->minTolerance ?
                          $this->simplify($shapeLayers[$name], $data, $tolerance) :
                          $data as $item) {
@@ -111,6 +112,7 @@ class TileService
                 }
                 foreach ($geometries as $geometry) {
                     $feature = new Tile\Feature();
+                    $feature->setId($item->getId());
                     $closePath = false;
                     $points = [];
                     try {
@@ -243,7 +245,8 @@ class TileService
                     $parameters = $this->getValues($layer, $feature);
                     $tags = $this->addValues($parameters, $keys, $values);
                     $newFeature->setTags($tags);
-                    $newFeature->setType(Tile\GeomType::LINESTRING);
+                    $newFeature->setId($feature->getId());
+                    $newFeature->setType($feature->getType());
                     $newFeature->setGeometry($feature->getGeometry());
                     $features[] = $newFeature;
                 }
@@ -329,14 +332,14 @@ class TileService
      * @throws CoordinateSystemException
      * @throws UnexpectedGeometryException
      * @throws GeometryEngineException
-     * @throws EmptyGeometryException
-     * @throws InvalidGeometryException
-     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected function simplify(Layer $layer, array $data, float $tolerance): array
     {
+        /** @var Geometry[][] $shapeByParameters */
         $shapeByParameters = [];
         $parameters = [];
+        $idsByType = [];
+        /** @var Shape[] $parents */
         foreach ($data as $shape) {
             if (!$shape instanceof Shape) {
                 continue;
@@ -347,64 +350,60 @@ class TileService
             if (!array_key_exists($key, $parameters)) {
                 $parameters[$key] = $values;
                 $shapeByParameters[$key] = [];
+                $idsByType[$key] = [];
             }
             foreach ($geometry instanceof GeometryCollection ? $geometry->geometries() : [$geometry] as $item) {
+                if (!array_key_exists($item->geometryTypeBinary(), $idsByType[$key])) {
+                    $idsByType[$key][$item->geometryTypeBinary()] = [];
+                }
                 $shapeByParameters[$key][] = $item;
+                $idsByType[$key][$item->geometryTypeBinary()][] = $shape->getId();
             }
         }
-        $result = [];
+        $result = $this->sourceFactory->create()->getLayer($layer->getName());
         foreach ($shapeByParameters as $key => $shapes) {
             $currentParameters = $parameters[$key];
-            $lines = [];
-            $polygons = [];
-            $points = [];
+            $shapesByTypes = [];
             foreach ($shapes as $shape) {
-                if ($shape instanceof LineString) {
-                    $lines[] = $shape;
-                } elseif ($shape instanceof Point) {
-                    $points[] = $shape;
-                } elseif ($shape instanceof Polygon) {
-                    $polygons[] = $shape;
-                } else {
-                    $result[] = new Shape($layer, $shape, $currentParameters);
+                if (!array_key_exists($shape->geometryTypeBinary(), $shapesByTypes)) {
+                    $shapesByTypes[$shape->geometryTypeBinary()] = [];
                 }
+                $shapesByTypes[$shape->geometryTypeBinary()][] = $shape;
             }
             $simplified = [];
-            if ($lines) {
-                $simplified[] = $this->geometryEngine->simplify(MultiLineString::of(...$lines), $tolerance);
-            }
-            if ($points) {
-                $simplified[] = $this->geometryEngine->simplify(MultiPoint::of(...$points), $tolerance);
-            }
-            if ($polygons) {
-                $exteriorRings = $this->geometryEngine->simplify(MultiLineString::of(...array_map(
-                    fn(Polygon $polygon) => $polygon->exteriorRing(), $polygons)), $tolerance);
-                if ($exteriorRings instanceof LineString && $exteriorRings->numPoints() > 3) {
-                    $simplified[] = Polygon::of($exteriorRings);
-                } elseif ($exteriorRings instanceof MultiLineString) {
-                    $polygons = array_map(fn(LineString $line) => Polygon::of($line),
-                        array_filter($exteriorRings->geometries(), fn(LineString $line) => $line->numPoints() > 3));
-                    if ($polygons) {
-                        $simplified[] = MultiPolygon::of(...$polygons);
-                    }
+            foreach ($shapesByTypes as $type => $items) {
+                if (!array_key_exists($type, $simplified)) {
+                    $simplified[$type] = [];
                 }
+                $simplified[$type][] = $this->geometryEngine->simplify(
+                    count($items) ? $this->geometryCollectionFactory->get($items) : array_shift($items), $tolerance
+                );
             }
-            foreach ($simplified as $collection) {
-                foreach ($collection instanceof GeometryCollection ? $collection->geometries() : [$collection] as $item) {
-                    if ($item instanceof Curve) {
-                        if ($this->geometryEngine->length($item) < $tolerance) {
-                            continue;
+            foreach ($simplified as $type => $byType) {
+                foreach ($byType as $collection) {
+                    foreach ($collection instanceof GeometryCollection ? $collection->geometries() : [$collection]
+                             as $item) {
+                        $id = array_shift($idsByType[$key][$type]);
+                        if ($item instanceof Curve) {
+                            if ($this->geometryEngine->length($item) < $tolerance) {
+                                continue;
+                            }
+                        } elseif ($item instanceof Surface) {
+                            if ($this->geometryEngine->area($item) < $tolerance) {
+                                continue;
+                            }
                         }
-                    } elseif ($item instanceof Surface) {
-                        if ($this->geometryEngine->area($item) < $tolerance) {
-                            continue;
-                        }
+                        $result->add(
+                            $item,
+                            $currentParameters,
+                            0,
+                            $id
+                        );
                     }
-                    $result[] = new Shape($layer, $item, $currentParameters);
                 }
             }
         }
-        return $result;
+        return $result->getShapes();
     }
 
     /**

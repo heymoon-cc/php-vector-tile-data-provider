@@ -5,7 +5,7 @@ namespace HeyMoon\MVTTools\Factory;
 use Brick\Geo\Engine\GeometryEngine;
 use Brick\Geo\Engine\GEOSEngine;
 
-final class GEOSTileServiceFactory extends AbstractTileServiceFactory
+final class GEOSServiceFactory extends AbstractServiceFactory
 {
     protected function createEngine(): GeometryEngine
     {

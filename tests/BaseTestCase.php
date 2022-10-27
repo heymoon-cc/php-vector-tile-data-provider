@@ -2,12 +2,16 @@
 /** @noinspection PhpIllegalPsrClassPathInspection */
 namespace HeyMoon\MVTTools\Tests;
 
+use Brick\Geo\Engine\GEOSEngine;
 use Brick\Geo\IO\GeoJSONReader;
+use Brick\Geo\IO\GeoJSONWriter;
 use Brick\Geo\Point;
-use HeyMoon\MVTTools\Factory\GEOSTileServiceFactory;
+use HeyMoon\MVTTools\Factory\GEOSServiceFactory;
+use HeyMoon\MVTTools\Factory\SourceFactory;
 use HeyMoon\MVTTools\Factory\TileFactory;
 use HeyMoon\MVTTools\Helper\EncodingHelper;
 use HeyMoon\MVTTools\Registry\BasicProjectionRegistry;
+use HeyMoon\MVTTools\Registry\EngineRegistry;
 use HeyMoon\MVTTools\Registry\ExportFormatRegistry;
 use HeyMoon\MVTTools\Service\ExportService;
 use HeyMoon\MVTTools\Service\GridService;
@@ -19,17 +23,18 @@ use Vector_tile\Tile\Layer;
 
 abstract class BaseTestCase extends TestCase
 {
-    private GEOSTileServiceFactory $tileServiceFactory;
+    private GEOSServiceFactory $serviceFactory;
     private ExportFormatRegistry $exportFormatRegistry;
     private ?TileService $tileService = null;
     private ?ExportService $exportService = null;
     private ?SpatialService $spatialService = null;
     private ?TileFactory $tileFactory = null;
     private ?GridService $gridService = null;
+    private ?SourceFactory $sourceFactory = null;
 
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
-        $this->tileServiceFactory = new GEOSTileServiceFactory();
+        $this->serviceFactory = new GEOSServiceFactory();
         $this->exportFormatRegistry = new ExportFormatRegistry();
         parent::__construct($name, $data, $dataName);
     }
@@ -45,9 +50,15 @@ abstract class BaseTestCase extends TestCase
         $this->assertEquals($expected->y(), $actual->y());
     }
 
+    protected function getSourceFactory(): SourceFactory
+    {
+        return $this->sourceFactory ?? ($this->sourceFactory =
+            $this->serviceFactory->getSourceFactory());
+    }
+
     protected function getTileService(...$args): TileService
     {
-        return $this->tileService ?? ($this->tileService = $this->tileServiceFactory->getTileService(...$args));
+        return $this->tileService ?? ($this->tileService = $this->serviceFactory->getTileService(...$args));
     }
 
     protected function getExportService(...$args): ExportService

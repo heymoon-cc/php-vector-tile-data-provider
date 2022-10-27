@@ -8,6 +8,7 @@ use Brick\Geo\Exception\GeometryIOException;
 use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
+use HeyMoon\MVTTools\Entity\Source;
 use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
 use HeyMoon\MVTTools\Entity\Layer;
 use HeyMoon\MVTTools\Entity\Shape;
@@ -18,6 +19,7 @@ class TilePartition
     private function __construct(private readonly TilePosition $position, private readonly array $shapes) {}
 
     /**
+     * @param Source $source
      * @param string $fixture
      * @return static
      * @throws CoordinateSystemException
@@ -26,17 +28,19 @@ class TilePartition
      * @throws UnexpectedGeometryException
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function load(string $fixture): static
+    public static function load(Source $source, string $fixture): static
     {
         $data = json_decode($fixture, true);
-        $layer = new Layer('test');
-        return new static(
-            TilePosition::key($data['key'], $data['zoom']),
-            array_map(fn (array $item) => new Shape(
-                $layer,
+        $layer = $source->getLayer('test');
+        foreach ($data['data'] as $item) {
+            $layer->add(
                 Geometry::fromText($item['geometry'])->withSRID(WebMercatorProjection::SRID),
                 $item['parameters']
-            ), $data['data'])
+            );
+        }
+        return new static(
+            TilePosition::key($data['key'], $data['zoom']),
+            $layer->getShapes()
         );
     }
 

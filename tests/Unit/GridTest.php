@@ -3,6 +3,8 @@
 namespace Unit;
 
 use HeyMoon\MVTTools\Entity\Grid;
+use HeyMoon\MVTTools\Entity\Shape;
+use HeyMoon\MVTTools\Entity\TilePosition;
 use HeyMoon\MVTTools\Service\GridService;
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\EmptyGeometryException;
@@ -62,6 +64,20 @@ class GridTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::isAligned
      * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::latitudeFromWGS84
      * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::longitudeFromWGS84
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getName
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getSource
+     * @covers \HeyMoon\MVTTools\Entity\Source::addFeature
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getParameters
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getFeatureParameters
+     * @covers \HeyMoon\MVTTools\Entity\Shape::asFeature
+     * @covers \HeyMoon\MVTTools\Entity\Shape::getId
+     * @covers \HeyMoon\MVTTools\Entity\Source::__construct
+     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getEngine
+     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getSourceFactory
+     * @covers \HeyMoon\MVTTools\Factory\GEOSServiceFactory::createEngine
+     * @covers \HeyMoon\MVTTools\Factory\SourceFactory::__construct
+     * @covers \HeyMoon\MVTTools\Factory\SourceFactory::create
+     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getGeometryCollectionFactory
      * @throws GeometryException
      * @throws CoordinateSystemException
      * @throws EmptyGeometryException
@@ -70,13 +86,20 @@ class GridTest extends BaseTestCase
     public function testGrid()
     {
         $service = $this->getGridService();
-        $source = new Source();
+        $source = $this->getSourceFactory()->create();
         $source->addCollection('moscow',
             $this->getGeoJSONReader()->read($this->getFixture('moscow.json.gz'))
         );
         $grid = $service->getGrid($source, 10);
         $i = 0;
-        $grid->iterate(function () use (&$i) {
+        $grid->iterate(function (TilePosition $position, array $data) use (&$i) {
+            /** @var Shape[] $data */
+            foreach ($data as $item) {
+                $this->assertArrayNotHasKey('id', $item->getParameters());
+                $feature = $item->asFeature();
+                $this->assertObjectHasAttribute('id', $feature->getProperties());
+                $this->assertEquals($item->getId(), $feature->getProperties()->id);
+            }
             $i++;
         });
         $this->assertEquals(10, $i);
