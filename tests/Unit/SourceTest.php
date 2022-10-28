@@ -2,6 +2,7 @@
 /** @noinspection PhpIllegalPsrClassPathInspection */
 namespace HeyMoon\MVTTools\Tests\Unit;
 
+use Brick\Geo\Exception\GeometryException;
 use Brick\Geo\Point;
 use HeyMoon\MVTTools\Entity\Source;
 use HeyMoon\MVTTools\Tests\BaseTestCase;
@@ -19,13 +20,13 @@ class SourceTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Entity\Layer::getSource
      * @covers \HeyMoon\MVTTools\Entity\Layer::getShapes
      * @covers \HeyMoon\MVTTools\Entity\Layer::addCollection
+     * @covers \HeyMoon\MVTTools\Entity\Layer::addFeature
      * @covers \HeyMoon\MVTTools\Entity\Shape::__construct
      * @covers \HeyMoon\MVTTools\Entity\Shape::asFeature
      * @covers \HeyMoon\MVTTools\Entity\Shape::getFeatureParameters
      * @covers \HeyMoon\MVTTools\Entity\Shape::getGeometry
      * @covers \HeyMoon\MVTTools\Entity\Shape::getId
      * @covers \HeyMoon\MVTTools\Entity\Shape::getLayer
-     * @covers \HeyMoon\MVTTools\Entity\Source::addFeature
      * @covers \HeyMoon\MVTTools\Entity\Source::count
      * @covers \HeyMoon\MVTTools\Entity\Source::getShapes
      * @covers \HeyMoon\MVTTools\Entity\Source::addCollection
@@ -36,6 +37,7 @@ class SourceTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Factory\SourceFactory::__construct
      * @covers \HeyMoon\MVTTools\Factory\SourceFactory::create
      * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getGeometryCollectionFactory
+     * @throws GeometryException
      */
     public function testSource()
     {
@@ -48,24 +50,20 @@ class SourceTest extends BaseTestCase
             }
         }
         $this->assertCount(5000, $source);
-        $shapes = $source->getShapes();
-        $first = array_shift($shapes);
-        $this->assertEquals(1, $first->getId());
-        $last = array_pop($shapes);
-        $this->assertEquals(5000, $last->getId());
-        $this->assertEquals('test5', $last->getLayer()->getName());
         foreach (range(1, 5) as $n) {
             $layer = $source->getLayer("test$n");
             $this->assertEquals("test$n", $layer->getName());
             $this->assertCount(1000, $layer);
             $featureCollection = $layer->getFeatureCollection();
             $this->assertCount($layer->count(), $featureCollection->getFeatures());
-            $new = $factory->create();
-            $new->addCollection("new$n", $featureCollection);
+            $new = $source->getLayer("new$n");
+            $this->assertCount(0, $new);
+            $new->addCollection($featureCollection);
+            $this->assertCount($layer->count(), $new);
             $newShapes = $new->getShapes();
             $shapes = $layer->getShapes();
-            $this->assertEquals(($n - 1) * 1000 + 1, array_key_first($shapes));
-            $this->assertEquals(($n) * 1000, array_key_last($shapes));
+            $this->assertEquals(1, array_key_first($shapes));
+            $this->assertEquals(1000, array_key_last($shapes));
             foreach (array_keys($shapes) as $id) {
                 $this->assertSame($shapes[$id]->getLayer(), $layer);
                 $this->assertNotSame($newShapes[$id]->getLayer(), $layer);

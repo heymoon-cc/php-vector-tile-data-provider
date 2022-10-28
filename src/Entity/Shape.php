@@ -23,7 +23,7 @@ class Shape extends AbstractSourceComponent implements Stringable
         private readonly int      $minZoom = 0,
         ?int $id = null
     ) {
-        $this->id = $this->layer->getSource()->addFeature($this, $id);
+        $this->id = $this->layer->addFeature($this, $id);
     }
 
     /**

@@ -6,15 +6,21 @@ use ArrayAccess;
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
+use Brick\Geo\GeometryCollection;
 use Brick\Geo\IO\GeoJSON\FeatureCollection;
 use Countable;
+use HeyMoon\MVTTools\Factory\GeometryCollectionFactory;
 use HeyMoon\MVTTools\Spatial\WorldGeodeticProjection;
 
-class Layer implements ArrayAccess, Countable
+class Layer extends AbstractSourceComponent implements ArrayAccess, Countable
 {
     private array $shapes = [];
 
-    public function __construct(private readonly string $name, private readonly Source $source) {}
+    public function __construct(
+        private readonly string $name,
+        private readonly Source $source,
+        private readonly GeometryCollectionFactory $geometryCollectionFactory
+    ) {}
 
     /**
      * @throws CoordinateSystemException
@@ -22,8 +28,7 @@ class Layer implements ArrayAccess, Countable
      */
     public function add(Geometry $geometry, array $properties = [], int $minZoom = 0, ?int $id = null): self
     {
-        $shape = new Shape($this, $geometry, $properties, $minZoom, $id);
-        $this->shapes[$shape->getId()] = $shape;
+        new Shape($this, $geometry, $properties, $minZoom, $id);
         return $this;
     }
 
@@ -101,5 +106,33 @@ class Layer implements ArrayAccess, Countable
     public function offsetUnset(mixed $offset): void
     {
         unset($this->shapes[$offset]);
+    }
+
+    /**
+     * @param Shape $feature
+     * @param int|null $id
+     * @return int
+     * @throws CoordinateSystemException
+     * @throws UnexpectedGeometryException
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
+    protected function addFeature(Shape $feature, ?int $id = null): int
+    {
+        $exists = $id && array_key_exists($id, $this->shapes);
+        if ($exists) {
+            $target = $this->shapes[$id]->getGeometry();
+            $add = $feature->getGeometry();
+            /** @var Geometry[] $collection */
+            $collection = array_merge(
+                $target instanceof GeometryCollection ? $target->geometries() : [$target],
+                $add instanceof GeometryCollection ? $add->geometries() : [$add]
+            );
+            $this->shapes[$id] = $feature->setGeometry($this->geometryCollectionFactory->get($collection));
+            return $id;
+        }
+        $id || empty($this->shapes) ?
+            ($this->shapes[$id ?? 1] = $feature) :
+            ($this->shapes[] = $feature);
+        return $id ?? array_key_last($this->shapes);
     }
 }

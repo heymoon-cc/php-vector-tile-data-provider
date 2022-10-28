@@ -70,9 +70,9 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Entity\Layer::add
      * @covers \HeyMoon\MVTTools\Entity\Layer::getShapes
      * @covers \HeyMoon\MVTTools\Entity\Layer::getSource
+     * @covers \HeyMoon\MVTTools\Entity\Layer::addFeature
      * @covers \HeyMoon\MVTTools\Entity\Source::__construct
      * @covers \HeyMoon\MVTTools\Entity\Shape::getId
-     * @covers \HeyMoon\MVTTools\Entity\Source::addFeature
      * @covers \HeyMoon\MVTTools\Entity\Source::getLayer
      * @covers \HeyMoon\MVTTools\Entity\Shape::setGeometry
      * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getSourceFactory
@@ -199,9 +199,9 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::latitudeFromWGS84
      * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::longitudeFromWGS84
      * @covers \HeyMoon\MVTTools\Entity\Shape::getId
-     * @covers \HeyMoon\MVTTools\Entity\Layer::getSource
-     * @covers \HeyMoon\MVTTools\Entity\Source::addFeature
      * @covers \HeyMoon\MVTTools\Entity\Source::__construct
+     * @covers \HeyMoon\MVTTools\Entity\Layer::getSource
+     * @covers \HeyMoon\MVTTools\Entity\Layer::addFeature
      * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getSourceFactory
      * @covers \HeyMoon\MVTTools\Factory\SourceFactory::__construct
      * @covers \HeyMoon\MVTTools\Factory\SourceFactory::create

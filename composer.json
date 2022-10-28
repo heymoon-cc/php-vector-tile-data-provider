@@ -1,6 +1,6 @@
 {
     "name": "heymoon/mvt-tools",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Serve or write Mapbox Vector Tile 2.1",
     "type": "library",
     "license": "MIT",
