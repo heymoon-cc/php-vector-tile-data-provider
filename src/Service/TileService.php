@@ -101,82 +101,84 @@ class TileService
             foreach ($tolerance > $this->minTolerance ?
                          $this->simplify($shapeLayers[$name], $data, $tolerance) :
                          $data as $item) {
-                $shape = $item->getGeometry();
-                if (!$this->geometryEngine->contains($bufferedBounds, $shape)) {
-                    $intersection = $this->geometryEngine->intersection($shape, $bufferedBounds);
-                    $geometries = $intersection instanceof GeometryCollection ? $intersection->geometries() : [$intersection];
-                } else {
-                    $geometries = [$shape];
-                }
-                foreach ($geometries as $geometry) {
-                    $feature = new Tile\Feature();
-                    $feature->setId($item->getId());
-                    $closePath = false;
-                    $points = [];
-                    try {
-                        if ($geometry instanceof Curve) {
-                            $previous = $geometry->startPoint();
-                            $points = method_exists($geometry, 'points') ? $geometry->points() :
-                                [$previous, $geometry->endPoint()];
-                            if ($geometry instanceof LineString) {
-                                $feature->setType(Tile\GeomType::LINESTRING);
-                            } else {
-                                $feature->setType(Tile\GeomType::UNKNOWN);
-                            }
-                        } elseif ($geometry instanceof Point) {
-                            $feature->setType(Tile\GeomType::POINT);
-                            $previous = $geometry;
-                        } elseif ($geometry instanceof Polygon) {
-                            $feature->setType(Tile\GeomType::POLYGON);
-                            $closePath = true;
-                            $points = $geometry->exteriorRing()->points();
-                            $previous = $geometry->exteriorRing()->startPoint();
-                        } else {
-                            continue;
-                        }
-                    } catch (EmptyGeometryException) {
-                        continue;
-                    }
-                    $parameters = $item->getParameters();
-                    $new = array_keys($parameters);
-                    foreach ($new as $key) {
-                        if (!in_array($key, $keys)) {
-                            $keys[] = $key;
-                        }
-                    }
-                    $feature->setTags($this->addValues($parameters, $keys, $values));
-                    $tileGeometry = [];
-                    $tileGeometry[] = $this->encodeCommand(static::MOVE_TO);
-                    $newX = (int)round(($previous->x() - $minPoint->x()) * $scale);
-                    if ($this->flip) {
-                        $newY = (int)round(($maxPoint->y() - $previous->y()) * $scale);
+                $shapes = $item->getGeometry();
+                foreach ($shapes instanceof GeometryCollection ? $shapes->geometries() : [$shapes] as $shape) {
+                    if (!$this->geometryEngine->contains($bufferedBounds, $shape)) {
+                        $intersection = $this->geometryEngine->intersection($shape, $bufferedBounds);
+                        $geometries = $intersection instanceof GeometryCollection ? $intersection->geometries() : [$intersection];
                     } else {
-                        $newY = (int)round(($previous->y() - $minPoint->y()) * $scale);
+                        $geometries = [$shape];
                     }
-                    $tileGeometry[] = $this->encodeValue($newX);
-                    $tileGeometry[] = $this->encodeValue($newY);
-                    $lineTo = [];
-                    $lineToCount = 0;
-                    foreach (array_slice($points, 1) as $point) {
-                        $newX = (int)round(($point->x() - $previous->x()) * $scale);
-                        $newY = (int)round(($point->y() - $previous->y()) * $scale);
-                        if ($newX === 0 && $newY === 0) {
+                    foreach ($geometries as $geometry) {
+                        $feature = new Tile\Feature();
+                        $feature->setId($item->getId());
+                        $closePath = false;
+                        $points = [];
+                        try {
+                            if ($geometry instanceof Curve) {
+                                $previous = $geometry->startPoint();
+                                $points = method_exists($geometry, 'points') ? $geometry->points() :
+                                    [$previous, $geometry->endPoint()];
+                                if ($geometry instanceof LineString) {
+                                    $feature->setType(Tile\GeomType::LINESTRING);
+                                } else {
+                                    $feature->setType(Tile\GeomType::UNKNOWN);
+                                }
+                            } elseif ($geometry instanceof Point) {
+                                $feature->setType(Tile\GeomType::POINT);
+                                $previous = $geometry;
+                            } elseif ($geometry instanceof Polygon) {
+                                $feature->setType(Tile\GeomType::POLYGON);
+                                $closePath = true;
+                                $points = $geometry->exteriorRing()->points();
+                                $previous = $geometry->exteriorRing()->startPoint();
+                            } else {
+                                continue;
+                            }
+                        } catch (EmptyGeometryException) {
                             continue;
                         }
-                        if ($this->flip) {
-                            $newY *= -1;
+                        $parameters = $item->getParameters();
+                        $new = array_keys($parameters);
+                        foreach ($new as $key) {
+                            if (!in_array($key, $keys)) {
+                                $keys[] = $key;
+                            }
                         }
-                        $lineTo[] = $this->encodeValue($newX);
-                        $lineTo[] = $this->encodeValue($newY);
-                        $previous = $point;
-                        $lineToCount++;
+                        $feature->setTags($this->addValues($parameters, $keys, $values));
+                        $tileGeometry = [];
+                        $tileGeometry[] = $this->encodeCommand(static::MOVE_TO);
+                        $newX = (int)round(($previous->x() - $minPoint->x()) * $scale);
+                        if ($this->flip) {
+                            $newY = (int)round(($maxPoint->y() - $previous->y()) * $scale);
+                        } else {
+                            $newY = (int)round(($previous->y() - $minPoint->y()) * $scale);
+                        }
+                        $tileGeometry[] = $this->encodeValue($newX);
+                        $tileGeometry[] = $this->encodeValue($newY);
+                        $lineTo = [];
+                        $lineToCount = 0;
+                        foreach (array_slice($points, 1) as $point) {
+                            $newX = (int)round(($point->x() - $previous->x()) * $scale);
+                            $newY = (int)round(($point->y() - $previous->y()) * $scale);
+                            if ($newX === 0 && $newY === 0) {
+                                continue;
+                            }
+                            if ($this->flip) {
+                                $newY *= -1;
+                            }
+                            $lineTo[] = $this->encodeValue($newX);
+                            $lineTo[] = $this->encodeValue($newY);
+                            $previous = $point;
+                            $lineToCount++;
+                        }
+                        $tileGeometry[] = $this->encodeCommand(static::LINE_TO, $lineToCount);
+                        if ($closePath) {
+                            $lineTo[] = $this->encodeCommand(static::CLOSE_PATH);
+                        }
+                        $feature->setGeometry(array_merge($tileGeometry, $lineTo));
+                        $features[] = $feature;
                     }
-                    $tileGeometry[] = $this->encodeCommand(static::LINE_TO, $lineToCount);
-                    if ($closePath) {
-                        $lineTo[] = $this->encodeCommand(static::CLOSE_PATH);
-                    }
-                    $feature->setGeometry(array_merge($tileGeometry, $lineTo));
-                    $features[] = $feature;
                 }
             }
             $layer = $this->createLayer($name, $extent);
