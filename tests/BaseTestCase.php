@@ -2,16 +2,13 @@
 /** @noinspection PhpIllegalPsrClassPathInspection */
 namespace HeyMoon\MVTTools\Tests;
 
-use Brick\Geo\Engine\GEOSEngine;
 use Brick\Geo\IO\GeoJSONReader;
-use Brick\Geo\IO\GeoJSONWriter;
 use Brick\Geo\Point;
 use HeyMoon\MVTTools\Factory\GEOSServiceFactory;
 use HeyMoon\MVTTools\Factory\SourceFactory;
 use HeyMoon\MVTTools\Factory\TileFactory;
 use HeyMoon\MVTTools\Helper\EncodingHelper;
 use HeyMoon\MVTTools\Registry\BasicProjectionRegistry;
-use HeyMoon\MVTTools\Registry\EngineRegistry;
 use HeyMoon\MVTTools\Registry\ExportFormatRegistry;
 use HeyMoon\MVTTools\Service\ExportService;
 use HeyMoon\MVTTools\Service\GridService;
@@ -69,7 +66,7 @@ abstract class BaseTestCase extends TestCase
 
     protected function getGridService(): GridService
     {
-        return $this->gridService ?? ($this->gridService = new GridService($this->getSpatialService()));
+        return $this->gridService ?? ($this->gridService = $this->serviceFactory->getGridService());
     }
 
     protected function getSpatialService(): SpatialService

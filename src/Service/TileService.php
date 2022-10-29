@@ -388,10 +388,6 @@ class TileService
                             if ($this->geometryEngine->length($item) < $tolerance) {
                                 continue;
                             }
-                        } elseif ($item instanceof Surface) {
-                            if ($this->geometryEngine->area($item) < $tolerance) {
-                                continue;
-                            }
                         }
                         $result->add(
                             $item,

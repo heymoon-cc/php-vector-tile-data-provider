@@ -24,6 +24,15 @@ class Grid
         return $this;
     }
 
+    /**
+     * @param TilePosition $position
+     * @return Shape[]
+     */
+    public function get(TilePosition $position): array
+    {
+        return ($position->getZoom() === $this->zoom) ? ($this->data[$position->getKey()] ?? []) : [];
+    }
+
     public function count(): int
     {
         return count($this->data);

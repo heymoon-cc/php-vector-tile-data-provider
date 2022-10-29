@@ -4,6 +4,7 @@ namespace HeyMoon\MVTTools\Factory;
 
 use Brick\Geo\Engine\GeometryEngine;
 use HeyMoon\MVTTools\Registry\BasicProjectionRegistry;
+use HeyMoon\MVTTools\Service\GridService;
 use HeyMoon\MVTTools\Service\SpatialService;
 use HeyMoon\MVTTools\Service\TileService;
 
@@ -13,6 +14,7 @@ abstract class AbstractServiceFactory
     private ?SpatialService $spatial = null;
     private ?SourceFactory $sourceFactory = null;
     private ?GeometryCollectionFactory $geometryCollectionFactory = null;
+    private ?GridService $gridService = null;
 
     public function getTileService(...$args): TileService
     {
@@ -26,6 +28,11 @@ abstract class AbstractServiceFactory
     public function getSpatialService(): SpatialService
     {
         return $this->spatial ?? ($this->spatial = new SpatialService(new BasicProjectionRegistry()));
+    }
+
+    public function getGridService(): GridService
+    {
+        return $this->gridService ?? ($this->gridService = new GridService($this->getSpatialService()));
     }
 
     public function getSourceFactory(): SourceFactory

@@ -2,15 +2,13 @@
 
 namespace HeyMoon\MVTTools\Service;
 
-use Brick\Geo\Curve;
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\EmptyGeometryException;
+use Brick\Geo\Exception\GeometryEngineException;
 use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\GeometryCollection;
-use Brick\Geo\LineString;
 use Brick\Geo\Point;
-use Brick\Geo\Polygon;
 use HeyMoon\MVTTools\Entity\Grid;
 use HeyMoon\MVTTools\Entity\Source;
 use HeyMoon\MVTTools\Entity\TilePosition;
@@ -22,13 +20,16 @@ use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
  */
 class GridService
 {
-    public function __construct(private readonly SpatialService $spatialService) {}
+    public function __construct(
+        private readonly SpatialService $spatialService
+    ) {}
 
     /**
      * @throws CoordinateSystemException
      * @throws EmptyGeometryException
      * @throws InvalidGeometryException
      * @throws UnexpectedGeometryException
+     * @throws GeometryEngineException
      * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -41,25 +42,16 @@ class GridService
                 continue;
             }
             $collection = $shape->getGeometry();
-            foreach ($collection instanceof GeometryCollection ?
-                         $collection->geometries() : [$collection] as $geometry) {
-                if ($geometry instanceof LineString) {
-                    list($minPoint, $maxPoint) = GeometryHelper::getLineBounds($geometry);
-                } elseif ($geometry instanceof Point) {
-                    $minPoint = $maxPoint = $geometry;
-                } elseif ($geometry instanceof Polygon) {
-                    list($minPoint, $maxPoint) = GeometryHelper::getBounds($geometry);
-                } elseif ($geometry instanceof Curve) {
-                    list($minPoint, $maxPoint) = GeometryHelper::getLineBounds(
-                        LineString::of($geometry->startPoint(), $geometry->endPoint())
-                    );
-                } else {
-                    continue;
-                }
-                $minColumn = $this->getColumn($minPoint, $tileWidth);
-                $minRow = $this->getRow($minPoint, $tileWidth);
-                $maxColumn = $this->getColumn($maxPoint, $tileWidth);
-                $maxRow = $this->getRow($maxPoint, $tileWidth);
+            foreach ($collection instanceof GeometryCollection ? $collection->geometries() : [$collection] as $geometry) {
+                $bounds = $geometry->getBoundingBox();
+                $westColumn = $this->getColumn($bounds->getSouthWest(), $tileWidth);
+                $westRow = $this->getRow($bounds->getSouthWest(), $tileWidth);
+                $eastColumn = $this->getColumn($bounds->getNorthEast(), $tileWidth);
+                $eastRow = $this->getRow($bounds->getNorthEast(), $tileWidth);
+                $minColumn = min($westColumn, $eastColumn);
+                $maxColumn = max($westColumn, $eastColumn);
+                $minRow = min($westRow, $eastRow);
+                $maxRow = max($westRow, $eastRow);
                 for ($column = $minColumn; $column <= $maxColumn; $column++) {
                     for ($row = $minRow; $row <= $maxRow; $row++) {
                         $position = TilePosition::xyz($column, $row, $zoom);
