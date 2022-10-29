@@ -13,14 +13,13 @@ use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\GeometryCollection;
 use Brick\Geo\LineString;
+use Brick\Geo\MultiPoint;
 use Brick\Geo\Point;
 use Brick\Geo\Polygon;
-use Brick\Geo\Surface;
 use ErrorException;
 use Exception;
 use HeyMoon\MVTTools\Factory\GeometryCollectionFactory;
 use HeyMoon\MVTTools\Factory\SourceFactory;
-use HeyMoon\MVTTools\Helper\GeometryHelper;
 use HeyMoon\MVTTools\Entity\Layer;
 use HeyMoon\MVTTools\Entity\Shape;
 use HeyMoon\MVTTools\Entity\TilePosition;
@@ -90,12 +89,11 @@ class TileService
         /** @var Tile\Value[] $values */
         $values = [];
         $features = [];
-        $border = $position->getBorder();
-        list($minPoint, $maxPoint) = GeometryHelper::getBounds($border);
-        $width = $maxPoint->x() - $minPoint->x();
-        $height = $maxPoint->y() - $minPoint->y();
-        $xScale = $extent / $width;
-        $yScale = $extent / $height;
+        $minPoint = $position->getMinPoint();
+        $maxPoint = $position->getMaxPoint();
+        $border = $this->geometryEngine->envelope(MultiPoint::of($position->getMinPoint(), $position->getMaxPoint()));
+        $width = $position->getTileWidth();
+        $scale = $extent / $width;
         $bufferedBounds = $buffer ? $this->geometryEngine->buffer($border, $buffer) : $border;
         $tolerance = $width / $extent;
         $layers = [];
@@ -149,19 +147,19 @@ class TileService
                     $feature->setTags($this->addValues($parameters, $keys, $values));
                     $tileGeometry = [];
                     $tileGeometry[] = $this->encodeCommand(static::MOVE_TO);
-                    $newX = (int)round(($previous->x() - $minPoint->x()) * $xScale);
+                    $newX = (int)round(($previous->x() - $minPoint->x()) * $scale);
                     if ($this->flip) {
-                        $newY = (int)round(($maxPoint->y() - $previous->y()) * $yScale);
+                        $newY = (int)round(($maxPoint->y() - $previous->y()) * $scale);
                     } else {
-                        $newY = (int)round(($previous->y() - $minPoint->y()) * $yScale);
+                        $newY = (int)round(($previous->y() - $minPoint->y()) * $scale);
                     }
                     $tileGeometry[] = $this->encodeValue($newX);
                     $tileGeometry[] = $this->encodeValue($newY);
                     $lineTo = [];
                     $lineToCount = 0;
                     foreach (array_slice($points, 1) as $point) {
-                        $newX = (int)round(($point->x() - $previous->x()) * $xScale);
-                        $newY = (int)round(($point->y() - $previous->y()) * $yScale);
+                        $newX = (int)round(($point->x() - $previous->x()) * $scale);
+                        $newY = (int)round(($point->y() - $previous->y()) * $scale);
                         if ($newX === 0 && $newY === 0) {
                             continue;
                         }
@@ -376,7 +374,7 @@ class TileService
                     $simplified[$type] = [];
                 }
                 $simplified[$type][] = $this->geometryEngine->simplify(
-                    count($items) ? $this->geometryCollectionFactory->get($items) : array_shift($items), $tolerance
+                    count($items) > 1 ? $this->geometryCollectionFactory->get($items) : array_shift($items), $tolerance
                 );
             }
             foreach ($simplified as $type => $byType) {

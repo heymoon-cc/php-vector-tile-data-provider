@@ -41,9 +41,7 @@ class GridTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Entity\TilePosition::key
      * @covers \HeyMoon\MVTTools\Entity\TilePosition::xyz
      * @covers \HeyMoon\MVTTools\Helper\EncodingHelper::getOriginalOrGZIP
-     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getBounds
      * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getGridSize
-     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getLineBounds
      * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getTileWidth
      * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::__construct
      * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::addProjection
@@ -149,9 +147,7 @@ class GridTest extends BaseTestCase
      * @covers \HeyMoon\MVTTools\Factory\SourceFactory::__construct
      * @covers \HeyMoon\MVTTools\Factory\SourceFactory::create
      * @covers \HeyMoon\MVTTools\Helper\EncodingHelper::getOriginalOrGZIP
-     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getBounds
      * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getGridSize
-     * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getLineBounds
      * @covers \HeyMoon\MVTTools\Helper\GeometryHelper::getTileWidth
      * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::__construct
      * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::addProjection

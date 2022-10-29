@@ -2,12 +2,9 @@
 
 namespace HeyMoon\MVTTools\Entity;
 
-use Brick\Geo\Exception\CoordinateSystemException;
-use Brick\Geo\Exception\EmptyGeometryException;
-use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Point;
-use Brick\Geo\Polygon;
 use HeyMoon\MVTTools\Helper\GeometryHelper;
+use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
 use Stringable;
 
 /**
@@ -19,9 +16,9 @@ class TilePosition implements Stringable
     private ?float $tileWidth = null;
     private ?int  $gridSize = null;
     private ?string $query = null;
-    private ?Polygon $border = null;
-    private ?array $bounds = null;
     private ?int $key = null;
+    private ?Point $minPoint = null;
+    private ?Point $maxPoint = null;
 
     private function __construct(
         private readonly int $column,
@@ -74,45 +71,6 @@ class TilePosition implements Stringable
     public function getGridSize(): int
     {
         return $this->gridSize ?? ($this->gridSize = GeometryHelper::getGridSize($this->getZoom()));
-    }
-
-    /**
-     * @throws CoordinateSystemException
-     * @throws InvalidGeometryException
-     */
-    public function getBorder(): Polygon
-    {
-        return $this->border ?? ($this->border = GeometryHelper::getTileBorder($this));
-    }
-
-    /**
-     * @throws EmptyGeometryException
-     * @throws CoordinateSystemException
-     * @throws InvalidGeometryException
-     */
-    public function getBounds(): array
-    {
-        return $this->bounds ?? ($this->bounds = GeometryHelper::getBounds($this->getBorder()));
-    }
-
-    /**
-     * @throws EmptyGeometryException
-     * @throws CoordinateSystemException
-     * @throws InvalidGeometryException
-     */
-    public function getMinPoint(): Point
-    {
-        return $this->getBounds()[0];
-    }
-
-    /**
-     * @throws EmptyGeometryException
-     * @throws CoordinateSystemException
-     * @throws InvalidGeometryException
-     */
-    public function getMaxPoint(): Point
-    {
-        return $this->getBounds()[1];
     }
 
     public function __toString(): string
@@ -171,5 +129,25 @@ class TilePosition implements Stringable
         $count = array_reduce(static::$registry, fn(int $c, array $item) => $c + count($item), 0);
         static::$registry = [];
         return $count;
+    }
+
+    public function getMinPoint(): Point
+    {
+        return $this->minPoint ?? ($this->minPoint = Point::xy($this->getColumn() * $this->getTileWidth()
+            - WebMercatorProjection::EARTH_RADIUS,
+            $this->getRow() * $this->getTileWidth()
+            - WebMercatorProjection::EARTH_RADIUS,
+            WebMercatorProjection::SRID
+        )->withSRID(WebMercatorProjection::SRID));
+    }
+
+    public function getMaxPoint(): Point
+    {
+        if ($this->maxPoint) {
+            return $this->maxPoint;
+        }
+        $minPoint = $this->getMinPoint();
+        return $this->maxPoint = Point::xy($minPoint->x() + $this->getTileWidth(), $minPoint->y() + $this->getTileWidth())
+            ->withSRID(WebMercatorProjection::SRID);
     }
 }
