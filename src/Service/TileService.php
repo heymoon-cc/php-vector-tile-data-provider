@@ -370,30 +370,66 @@ class TileService
             }
             $simplified = [];
             foreach ($shapesByTypes as $type => $items) {
-                if (!array_key_exists($type, $simplified)) {
-                    $simplified[$type] = [];
-                }
-                $simplified[$type][] = $this->geometryEngine->simplify(
+                $simplified[$type] = $this->geometryEngine->simplify(
                     count($items) > 1 ? $this->geometryCollectionFactory->get($items) : array_shift($items), $tolerance
                 );
             }
-            foreach ($simplified as $type => $byType) {
-                foreach ($byType as $collection) {
-                    foreach ($collection instanceof GeometryCollection ? $collection->geometries() : [$collection]
-                             as $item) {
+            foreach ($simplified as $type => $collection) {
+                $data = $collection instanceof GeometryCollection ? $collection->geometries() : [$collection];
+                $simpleCount = count($data);
+                $originalCount = count($shapesByTypes[$type]);
+                if ($simpleCount < $originalCount) {
+                    $processedGeometry = [];
+                    $processedId = [];
+                    foreach ($shapesByTypes[$type] as $item) {
                         $id = array_shift($idsByType[$key][$type]);
-                        if ($item instanceof Curve) {
-                            if ($this->geometryEngine->length($item) < $tolerance) {
-                                continue;
+                        $area = $this->geometryEngine->buffer($this->geometryEngine->centroid($item), $tolerance);
+                        foreach ($data as $index => $simple) {
+                            if ($this->geometryEngine->contains($area, $this->geometryEngine->centroid($simple))) {
+                                $processedGeometry[] = $simple;
+                                $processedId[] = $id;
+                                unset($data[$index]);
+                                if (count($data)) {
+                                    break;
+                                }
+                                break 2;
                             }
                         }
-                        $result->add(
-                            $item,
-                            $currentParameters,
-                            0,
-                            $id
-                        );
                     }
+                    $data = $processedGeometry;
+                    $idsByType[$key][$type] = $processedId;
+                } elseif ($simpleCount > $originalCount) {
+                    $processedGeometry = [];
+                    $processedId = [];
+                    foreach ($data as $simple) {
+                        $id = array_shift($idsByType[$key][$type]);
+                        if (!$id) {
+                            break;
+                        }
+                        $area = $this->geometryEngine->buffer($this->geometryEngine->centroid($idsByType[$key][$type]), $tolerance);
+                        foreach ($shapesByTypes[$type] as $item) {
+                            if ($this->geometryEngine->contains($area, $this->geometryEngine->centroid($item))) {
+                                $processedGeometry[] = $simple;
+                                $processedId[] = $id;
+                            }
+                        }
+                    }
+                    $data = $processedGeometry;
+                    $idsByType[$key][$type] = $processedId;
+                }
+                foreach ($data as $item) {
+                    $id = array_shift($idsByType[$key][$type]);
+                    if ($item instanceof Curve) {
+                        if ($this->geometryEngine->length($item) < $tolerance) {
+                            continue;
+                        }
+                    }
+                    $result->add(
+                        $item,
+                        $currentParameters,
+                        0,
+                        $id
+                    );
                 }
             }
         }
