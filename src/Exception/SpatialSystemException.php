@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Exception;
+namespace HeyMoon\VectorTileDataProvider\Exception;
 
 use RuntimeException;
 

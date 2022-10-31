@@ -1,37 +1,37 @@
 <?php
 /** @noinspection PhpIllegalPsrClassPathInspection */
-namespace HeyMoon\MVTTools\Tests\Unit;
+namespace HeyMoon\VectorTileDataProvider\Tests\Unit;
 
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\EmptyGeometryException;
 use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Point;
-use HeyMoon\MVTTools\Tests\BaseTestCase;
-use HeyMoon\MVTTools\Service\SpatialService;
-use HeyMoon\MVTTools\Spatial\AbstractProjection;
+use HeyMoon\VectorTileDataProvider\Tests\BaseTestCase;
+use HeyMoon\VectorTileDataProvider\Service\SpatialService;
+use HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection;
 
 class SpatialTest extends BaseTestCase
 {
     /**
      * Reference values from https://epsg.io/transform#s_srs=4326&t_srs=3857&x=37&y=55
-     * @covers \HeyMoon\MVTTools\Service\SpatialService::transform
-     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::toWGS84
-     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::fromWGS84
-     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::__construct
-     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::addProjection
-     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::get
-     * @covers \HeyMoon\MVTTools\Registry\BasicProjectionRegistry::supports
-     * @covers \HeyMoon\MVTTools\Service\SpatialService::__construct
-     * @covers \HeyMoon\MVTTools\Service\SpatialService::transformPoint
-     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::__construct
-     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::get
-     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::getSRID
-     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::isAligned
-     * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::latitudeFromWGS84
-     * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::latitudeToWGS84
-     * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::longitudeFromWGS84
-     * @covers \HeyMoon\MVTTools\Spatial\WebMercatorProjection::longitudeToWGS84
+     * @covers \HeyMoon\VectorTileDataProvider\Service\SpatialService::transform
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::toWGS84
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::fromWGS84
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry::addProjection
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry::get
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\BasicProjectionRegistry::supports
+     * @covers \HeyMoon\VectorTileDataProvider\Service\SpatialService::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Service\SpatialService::transformPoint
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::get
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::getSRID
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::isAligned
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::latitudeFromWGS84
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::latitudeToWGS84
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::longitudeFromWGS84
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::longitudeToWGS84
      * @throws CoordinateSystemException
      * @throws UnexpectedGeometryException
      * @throws EmptyGeometryException

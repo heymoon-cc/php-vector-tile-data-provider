@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Spatial;
+namespace HeyMoon\VectorTileDataProvider\Spatial;
 
 /**
  * https://stackoverflow.com/a/40403522

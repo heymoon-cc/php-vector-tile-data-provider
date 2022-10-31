@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Spatial;
+namespace HeyMoon\VectorTileDataProvider\Spatial;
 
 use Brick\Geo\Geometry;
 use Brick\Geo\Point;

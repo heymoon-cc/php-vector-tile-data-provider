@@ -1,9 +1,9 @@
 <?php
 
-namespace HeyMoon\MVTTools\Registry;
+namespace HeyMoon\VectorTileDataProvider\Registry;
 
-use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
-use HeyMoon\MVTTools\Spatial\WorldGeodeticProjection;
+use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
+use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 
 class BasicProjectionRegistry extends AbstractProjectionRegistry
 {

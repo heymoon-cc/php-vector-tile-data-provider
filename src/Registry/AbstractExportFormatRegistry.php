@@ -1,10 +1,10 @@
 <?php
 
-namespace HeyMoon\MVTTools\Registry;
+namespace HeyMoon\VectorTileDataProvider\Registry;
 
-use HeyMoon\MVTTools\Exception\MissingDependencyException;
-use HeyMoon\MVTTools\Exception\UnknownFormatException;
-use HeyMoon\MVTTools\Export\ExportFormatInterface;
+use HeyMoon\VectorTileDataProvider\Exception\MissingDependencyException;
+use HeyMoon\VectorTileDataProvider\Exception\UnknownFormatException;
+use HeyMoon\VectorTileDataProvider\Export\ExportFormatInterface;
 
 abstract class AbstractExportFormatRegistry
 {

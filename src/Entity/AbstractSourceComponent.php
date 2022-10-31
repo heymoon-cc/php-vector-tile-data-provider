@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Entity;
+namespace HeyMoon\VectorTileDataProvider\Entity;
 
 use Brick\Geo\Geometry;
 
@@ -9,7 +9,7 @@ abstract class AbstractSourceComponent
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function addFeature(Shape $feature, ?int $id = null): int
+    protected function addFeature(Feature $feature, ?int $id = null): int
     {
         return 0;
     }

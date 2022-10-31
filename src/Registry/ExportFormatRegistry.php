@@ -1,9 +1,9 @@
 <?php
 
-namespace HeyMoon\MVTTools\Registry;
+namespace HeyMoon\VectorTileDataProvider\Registry;
 
-use HeyMoon\MVTTools\Export\SvgExportFormat;
-use HeyMoon\MVTTools\Service\MvtExportFormat;
+use HeyMoon\VectorTileDataProvider\Export\MvtExportFormat;
+use HeyMoon\VectorTileDataProvider\Export\SvgExportFormat;
 
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)

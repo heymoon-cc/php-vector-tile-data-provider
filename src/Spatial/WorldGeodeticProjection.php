@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Spatial;
+namespace HeyMoon\VectorTileDataProvider\Spatial;
 
 class WorldGeodeticProjection extends AbstractProjection
 {

@@ -1,5 +1,5 @@
 <?php
 
-namespace HeyMoon\MVTTools\Exception;
+namespace HeyMoon\VectorTileDataProvider\Exception;
 
 class SpatialSystemDecodeException extends SpatialSystemException {}

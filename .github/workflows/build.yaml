@@ -1,5 +1,5 @@
 name: Build
-run-name: ${{ github.actor }} is building heymoon/mvt-tools-tester image
+run-name: ${{ github.actor }} is building heymoon/php-vector-tile-data-provider-tester
 on:
   workflow_dispatch: {}
   push:

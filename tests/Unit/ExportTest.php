@@ -1,42 +1,43 @@
 <?php
 /** @noinspection PhpIllegalPsrClassPathInspection */
-namespace HeyMoon\MVTTools\Tests\Unit;
+namespace HeyMoon\VectorTileDataProvider\Tests\Unit;
 
 use Exception;
-use HeyMoon\MVTTools\Service\ExportService;
-use HeyMoon\MVTTools\Tests\BaseTestCase;
+use HeyMoon\VectorTileDataProvider\Service\ExportService;
+use HeyMoon\VectorTileDataProvider\Tests\BaseTestCase;
 use SVG\SVG;
 
 class ExportTest extends BaseTestCase
 {
     /**
-     * @covers \HeyMoon\MVTTools\Service\ExportService::convert
-     * @covers \HeyMoon\MVTTools\Export\AbstractExportFormat::isAvailable
-     * @covers \HeyMoon\MVTTools\Export\SvgExportFormat::export
-     * @covers \HeyMoon\MVTTools\Export\SvgExportFormat::getDependencyClass
-     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getEngine
-     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getSpatialService
-     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getTileService
-     * @covers \HeyMoon\MVTTools\Factory\GEOSServiceFactory::createEngine
-     * @covers \HeyMoon\MVTTools\Factory\TileFactory::parse
-     * @covers \HeyMoon\MVTTools\Helper\EncodingHelper::getOriginalOrGZIP
-     * @covers \HeyMoon\MVTTools\Registry\AbstractExportFormatRegistry::get
-     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::__construct
-     * @covers \HeyMoon\MVTTools\Registry\AbstractProjectionRegistry::addProjection
-     * @covers \HeyMoon\MVTTools\Registry\BasicProjectionRegistry::supports
-     * @covers \HeyMoon\MVTTools\Service\ExportService::__construct
-     * @covers \HeyMoon\MVTTools\Service\SpatialService::__construct
-     * @covers \HeyMoon\MVTTools\Service\TileService::__construct
-     * @covers \HeyMoon\MVTTools\Service\TileService::decodeCommand
-     * @covers \HeyMoon\MVTTools\Service\TileService::decodeValue
-     * @covers \HeyMoon\MVTTools\Service\TileService::getExtent
-     * @covers \HeyMoon\MVTTools\Service\TileService::getValues
-     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::__construct
-     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::get
-     * @covers \HeyMoon\MVTTools\Spatial\AbstractProjection::getSRID
-     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getSourceFactory
-     * @covers \HeyMoon\MVTTools\Factory\SourceFactory::__construct
-     * @covers \HeyMoon\MVTTools\Factory\AbstractServiceFactory::getGeometryCollectionFactory
+     * @covers \HeyMoon\VectorTileDataProvider\Service\ExportService::convert
+     * @covers \HeyMoon\VectorTileDataProvider\Export\AbstractExportFormat::isAvailable
+     * @covers \HeyMoon\VectorTileDataProvider\Export\SvgExportFormat::export
+     * @covers \HeyMoon\VectorTileDataProvider\Export\SvgExportFormat::getDependencyClass
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getEngine
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getSpatialService
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getTileService
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\GEOSServiceFactory::createEngine
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\TileFactory::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\TileFactory::parse
+     * @covers \HeyMoon\VectorTileDataProvider\Helper\EncodingHelper::getOriginalOrGZIP
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\AbstractExportFormatRegistry::get
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry::addProjection
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\BasicProjectionRegistry::supports
+     * @covers \HeyMoon\VectorTileDataProvider\Service\ExportService::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Service\SpatialService::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::decodeCommand
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::decodeValue
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getExtent
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getValues
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::get
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::getSRID
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getSourceFactory
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\SourceFactory::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getGeometryCollectionFactory
      * @throws Exception
      */
     public function testExport()

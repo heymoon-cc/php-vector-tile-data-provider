@@ -1,9 +1,9 @@
 <?php
 
-namespace HeyMoon\MVTTools\Export;
+namespace HeyMoon\VectorTileDataProvider\Export;
 
 use ErrorException;
-use HeyMoon\MVTTools\Service\TileService;
+use HeyMoon\VectorTileDataProvider\Service\TileService;
 use SVG\Nodes\Shapes\SVGCircle;
 use SVG\Nodes\Shapes\SVGPath;
 use SVG\Nodes\Shapes\SVGRect;

@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Entity;
+namespace HeyMoon\VectorTileDataProvider\Entity;
 
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)
@@ -26,7 +26,7 @@ class Grid
 
     /**
      * @param TilePosition $position
-     * @return Shape[]
+     * @return Feature[]
      */
     public function get(TilePosition $position): array
     {

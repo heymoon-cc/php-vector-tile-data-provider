@@ -1,14 +1,14 @@
 <?php
 
-namespace HeyMoon\MVTTools\Entity;
+namespace HeyMoon\VectorTileDataProvider\Entity;
 
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
-use Brick\Geo\IO\GeoJSON\Feature;
+use Brick\Geo\IO\GeoJSON\Feature as GeoJSONFeature;
 use Stringable;
 
-class Shape extends AbstractSourceComponent implements Stringable
+class Feature extends AbstractSourceComponent implements Stringable
 {
     private int $id;
 
@@ -64,9 +64,9 @@ class Shape extends AbstractSourceComponent implements Stringable
         return array_diff_key($this->parameters, ['id' => $this->id]);
     }
 
-    public function asFeature(): Feature
+    public function asGeoJSONFeature(): GeoJSONFeature
     {
-        return new Feature($this->getGeometry(), $this->getFeatureParameters());
+        return new GeoJSONFeature($this->getGeometry(), $this->getFeatureParameters());
     }
 
     public function getParameter($key): mixed

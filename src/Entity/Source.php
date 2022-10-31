@@ -1,14 +1,14 @@
 <?php
 
-namespace HeyMoon\MVTTools\Entity;
+namespace HeyMoon\VectorTileDataProvider\Entity;
 
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\IO\GeoJSON\FeatureCollection;
 use Countable;
-use HeyMoon\MVTTools\Factory\GeometryCollectionFactory;
-use HeyMoon\MVTTools\Spatial\WorldGeodeticProjection;
+use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
+use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 
 class Source implements Countable
 {
@@ -43,11 +43,11 @@ class Source implements Countable
     }
 
     /**
-     * @return Shape[]
+     * @return Feature[]
      */
-    public function getShapes(): array
+    public function getFeatures(): array
     {
-        return array_merge(...array_map(fn(Layer $layer) => $layer->getShapes(), array_values($this->layers)));
+        return array_merge(...array_map(fn(Layer $layer) => $layer->getFeatures(), array_values($this->layers)));
     }
 
     public function count(): int

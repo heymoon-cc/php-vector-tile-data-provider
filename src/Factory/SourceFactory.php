@@ -1,8 +1,8 @@
 <?php
 
-namespace HeyMoon\MVTTools\Factory;
+namespace HeyMoon\VectorTileDataProvider\Factory;
 
-use HeyMoon\MVTTools\Entity\Source;
+use HeyMoon\VectorTileDataProvider\Entity\Source;
 
 class SourceFactory
 {

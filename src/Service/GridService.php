@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Service;
+namespace HeyMoon\VectorTileDataProvider\Service;
 
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\EmptyGeometryException;
@@ -9,14 +9,14 @@ use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\GeometryCollection;
 use Brick\Geo\Point;
-use HeyMoon\MVTTools\Entity\Grid;
-use HeyMoon\MVTTools\Entity\Source;
-use HeyMoon\MVTTools\Entity\TilePosition;
-use HeyMoon\MVTTools\Helper\GeometryHelper;
-use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
+use HeyMoon\VectorTileDataProvider\Entity\Grid;
+use HeyMoon\VectorTileDataProvider\Entity\Source;
+use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
+use HeyMoon\VectorTileDataProvider\Helper\GeometryHelper;
+use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
 
 /**
- * Filter source shapes by minZoom and group them by common tiles on given zoom
+ * Filter source features by minZoom and group them by common tiles on given zoom
  */
 class GridService
 {
@@ -37,11 +37,11 @@ class GridService
     {
         $grid = [];
         $tileWidth = GeometryHelper::getTileWidth($zoom);
-        foreach ($this->spatialService->check($source->getShapes(), WebMercatorProjection::SRID) as $shape) {
-            if ($shape->getMinZoom() > $zoom) {
+        foreach ($this->spatialService->check($source->getFeatures(), WebMercatorProjection::SRID) as $feature) {
+            if ($feature->getMinZoom() > $zoom) {
                 continue;
             }
-            $collection = $shape->getGeometry();
+            $collection = $feature->getGeometry();
             foreach ($collection instanceof GeometryCollection ? $collection->geometries() : [$collection] as $geometry) {
                 $bounds = $geometry->getBoundingBox();
                 $westColumn = $this->getColumn($bounds->getSouthWest(), $tileWidth);
@@ -64,7 +64,7 @@ class GridService
                         if (!array_key_exists($key, $grid)) {
                             $grid[$key] = [];
                         }
-                        $grid[$key][] = $shape;
+                        $grid[$key][] = $feature;
                     }
                 }
             }

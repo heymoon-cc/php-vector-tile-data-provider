@@ -1,10 +1,10 @@
 <?php
 
-namespace HeyMoon\MVTTools\Entity;
+namespace HeyMoon\VectorTileDataProvider\Entity;
 
 use Brick\Geo\Point;
-use HeyMoon\MVTTools\Helper\GeometryHelper;
-use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
+use HeyMoon\VectorTileDataProvider\Helper\GeometryHelper;
+use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
 use Stringable;
 
 /**

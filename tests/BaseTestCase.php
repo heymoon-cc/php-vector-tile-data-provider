@@ -1,19 +1,19 @@
 <?php
 /** @noinspection PhpIllegalPsrClassPathInspection */
-namespace HeyMoon\MVTTools\Tests;
+namespace HeyMoon\VectorTileDataProvider\Tests;
 
 use Brick\Geo\IO\GeoJSONReader;
 use Brick\Geo\Point;
-use HeyMoon\MVTTools\Factory\GEOSServiceFactory;
-use HeyMoon\MVTTools\Factory\SourceFactory;
-use HeyMoon\MVTTools\Factory\TileFactory;
-use HeyMoon\MVTTools\Helper\EncodingHelper;
-use HeyMoon\MVTTools\Registry\BasicProjectionRegistry;
-use HeyMoon\MVTTools\Registry\ExportFormatRegistry;
-use HeyMoon\MVTTools\Service\ExportService;
-use HeyMoon\MVTTools\Service\GridService;
-use HeyMoon\MVTTools\Service\SpatialService;
-use HeyMoon\MVTTools\Service\TileService;
+use HeyMoon\VectorTileDataProvider\Factory\GEOSServiceFactory;
+use HeyMoon\VectorTileDataProvider\Factory\SourceFactory;
+use HeyMoon\VectorTileDataProvider\Factory\TileFactory;
+use HeyMoon\VectorTileDataProvider\Helper\EncodingHelper;
+use HeyMoon\VectorTileDataProvider\Registry\BasicProjectionRegistry;
+use HeyMoon\VectorTileDataProvider\Registry\ExportFormatRegistry;
+use HeyMoon\VectorTileDataProvider\Service\ExportService;
+use HeyMoon\VectorTileDataProvider\Service\GridService;
+use HeyMoon\VectorTileDataProvider\Service\SpatialService;
+use HeyMoon\VectorTileDataProvider\Service\TileService;
 use PHPUnit\Framework\TestCase;
 use Vector_tile\Tile;
 use Vector_tile\Tile\Layer;
@@ -76,7 +76,7 @@ abstract class BaseTestCase extends TestCase
 
     protected function getTileFactory(): TileFactory
     {
-        return $this->tileFactory ?? ($this->tileFactory = new TileFactory());
+        return $this->tileFactory ?? ($this->tileFactory = new TileFactory($this->getTileService()));
     }
 
     protected function getGeoJSONReader(): GeoJSONReader

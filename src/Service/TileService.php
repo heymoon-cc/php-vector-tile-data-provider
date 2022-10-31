@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Service;
+namespace HeyMoon\VectorTileDataProvider\Service;
 
 use Brick\Geo\Curve;
 use Brick\Geo\Engine\GeometryEngine;
@@ -18,11 +18,11 @@ use Brick\Geo\Point;
 use Brick\Geo\Polygon;
 use ErrorException;
 use Exception;
-use HeyMoon\MVTTools\Factory\GeometryCollectionFactory;
-use HeyMoon\MVTTools\Factory\SourceFactory;
-use HeyMoon\MVTTools\Entity\Layer;
-use HeyMoon\MVTTools\Entity\Shape;
-use HeyMoon\MVTTools\Entity\TilePosition;
+use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
+use HeyMoon\VectorTileDataProvider\Factory\SourceFactory;
+use HeyMoon\VectorTileDataProvider\Entity\Layer;
+use HeyMoon\VectorTileDataProvider\Entity\Feature;
+use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use Vector_tile\Tile;
 
 /**
@@ -54,7 +54,7 @@ class TileService
     ) {}
 
     /**
-     * @param Shape[] $shapes
+     * @param Feature[] $shapes
      * @param TilePosition $position
      * @param int $extent
      * @param float|null $buffer
@@ -326,9 +326,9 @@ class TileService
 
     /**
      * @param Layer $layer
-     * @param Shape[] $data
+     * @param Feature[] $data
      * @param float $tolerance
-     * @return Shape[]
+     * @return Feature[]
      * @throws CoordinateSystemException
      * @throws UnexpectedGeometryException
      * @throws GeometryEngineException
@@ -339,9 +339,9 @@ class TileService
         $shapeByParameters = [];
         $parameters = [];
         $idsByType = [];
-        /** @var Shape[] $parents */
+        /** @var Feature[] $parents */
         foreach ($data as $shape) {
-            if (!$shape instanceof Shape) {
+            if (!$shape instanceof Feature) {
                 continue;
             }
             $geometry = $shape->getGeometry();
@@ -394,7 +394,7 @@ class TileService
                 }
             }
         }
-        return $result->getShapes();
+        return $result->getFeatures();
     }
 
     /**

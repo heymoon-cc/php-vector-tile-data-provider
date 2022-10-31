@@ -1,9 +1,10 @@
 <?php
 
-namespace HeyMoon\MVTTools\Factory;
+namespace HeyMoon\VectorTileDataProvider\Factory;
 
 use Exception;
-use HeyMoon\MVTTools\Helper\EncodingHelper;
+use HeyMoon\VectorTileDataProvider\Helper\EncodingHelper;
+use HeyMoon\VectorTileDataProvider\Service\TileService;
 use Vector_tile\Tile;
 
 /**
@@ -11,14 +12,21 @@ use Vector_tile\Tile;
  */
 class TileFactory
 {
-    public function parse(string $data): ?Tile
+    public function __construct(private readonly TileService $tileService) {}
+
+    public function parse(string $data, ?Tile $target = null): ?Tile
     {
-        $tile = new Tile();
+        $tile = $target ?? new Tile();
         try {
             $tile->mergeFromString(EncodingHelper::getOriginalOrGZIP($data));
         } catch (Exception) {
             return null;
         }
         return $tile;
+    }
+
+    public function merge(Tile $tile, string $data): ?Tile
+    {
+        return $this->tileService->mergeLayers($this->parse($data, $tile));
     }
 }

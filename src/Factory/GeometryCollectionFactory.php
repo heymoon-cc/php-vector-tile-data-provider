@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Factory;
+namespace HeyMoon\VectorTileDataProvider\Factory;
 
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\UnexpectedGeometryException;

@@ -1,18 +1,18 @@
 <?php
 /** @noinspection PhpIllegalPsrClassPathInspection */
 
-namespace HeyMoon\MVTTools\Tests\Fixture;
+namespace HeyMoon\VectorTileDataProvider\Tests\Fixture;
 
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\GeometryIOException;
 use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
-use HeyMoon\MVTTools\Entity\Source;
-use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
-use HeyMoon\MVTTools\Entity\Layer;
-use HeyMoon\MVTTools\Entity\Shape;
-use HeyMoon\MVTTools\Entity\TilePosition;
+use HeyMoon\VectorTileDataProvider\Entity\Source;
+use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
+use HeyMoon\VectorTileDataProvider\Entity\Layer;
+use HeyMoon\VectorTileDataProvider\Entity\Feature;
+use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 
 class TilePartition
 {
@@ -40,7 +40,7 @@ class TilePartition
         }
         return new static(
             TilePosition::key($data['key'], $data['zoom']),
-            $layer->getShapes()
+            $layer->getFeatures()
         );
     }
 
@@ -55,7 +55,7 @@ class TilePartition
     /**
      * @return array
      */
-    public function getShapes(): array
+    public function getFeatures(): array
     {
         return $this->shapes;
     }

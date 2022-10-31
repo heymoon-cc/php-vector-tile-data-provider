@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Service;
+namespace HeyMoon\VectorTileDataProvider\Service;
 
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\EmptyGeometryException;
@@ -13,12 +13,12 @@ use Brick\Geo\MultiPoint;
 use Brick\Geo\MultiPolygon;
 use Brick\Geo\Point;
 use Brick\Geo\Polygon;
-use HeyMoon\MVTTools\Entity\AbstractSourceComponent;
-use HeyMoon\MVTTools\Entity\Shape;
-use HeyMoon\MVTTools\Exception\SpatialSystemDecodeException;
-use HeyMoon\MVTTools\Exception\SpatialSystemEncodeException;
-use HeyMoon\MVTTools\Registry\AbstractProjectionRegistry;
-use HeyMoon\MVTTools\Spatial\WorldGeodeticProjection;
+use HeyMoon\VectorTileDataProvider\Entity\AbstractSourceComponent;
+use HeyMoon\VectorTileDataProvider\Entity\Feature;
+use HeyMoon\VectorTileDataProvider\Exception\SpatialSystemDecodeException;
+use HeyMoon\VectorTileDataProvider\Exception\SpatialSystemEncodeException;
+use HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry;
+use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)
@@ -28,20 +28,20 @@ class SpatialService extends AbstractSourceComponent
     public function __construct(private readonly AbstractProjectionRegistry $projectionRegistry) {}
 
     /**
-     * @param Shape[] $shapes
+     * @param Feature[] $features
      * @param int $srid
-     * @return Shape[]
+     * @return Feature[]
      * @throws CoordinateSystemException
      * @throws EmptyGeometryException
      * @throws InvalidGeometryException
      * @throws UnexpectedGeometryException
      */
-    public function check(array $shapes, int $srid): array
+    public function check(array $features, int $srid): array
     {
-        return array_map(fn(Shape $shape) =>
-            $shape->getGeometry()->SRID() === $srid ? $shape : $shape->setGeometry(
-            $this->transform($shape->getGeometry(), $srid)),
-            $shapes
+        return array_map(fn(Feature $feature) =>
+            $feature->getGeometry()->SRID() === $srid ? $feature : $feature->setGeometry(
+            $this->transform($feature->getGeometry(), $srid)),
+            $features
         );
     }
 

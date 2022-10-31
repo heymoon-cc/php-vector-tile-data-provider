@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Helper;
+namespace HeyMoon\VectorTileDataProvider\Helper;
 
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)

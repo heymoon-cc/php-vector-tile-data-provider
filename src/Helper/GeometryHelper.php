@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Helper;
+namespace HeyMoon\VectorTileDataProvider\Helper;
 
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\EmptyGeometryException;
@@ -8,8 +8,8 @@ use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\LineString;
 use Brick\Geo\Point;
 use Brick\Geo\Polygon;
-use HeyMoon\MVTTools\Spatial\WebMercatorProjection;
-use HeyMoon\MVTTools\Entity\TilePosition;
+use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
+use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)

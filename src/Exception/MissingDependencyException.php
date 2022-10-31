@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Exception;
+namespace HeyMoon\VectorTileDataProvider\Exception;
 
 final class MissingDependencyException extends FormatSupportException
 {

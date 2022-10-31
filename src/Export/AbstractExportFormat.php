@@ -1,6 +1,6 @@
 <?php
 
-namespace HeyMoon\MVTTools\Export;
+namespace HeyMoon\VectorTileDataProvider\Export;
 
 abstract class AbstractExportFormat implements ExportFormatInterface
 {

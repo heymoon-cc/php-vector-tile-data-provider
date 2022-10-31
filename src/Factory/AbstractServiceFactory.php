@@ -1,12 +1,12 @@
 <?php
 
-namespace HeyMoon\MVTTools\Factory;
+namespace HeyMoon\VectorTileDataProvider\Factory;
 
 use Brick\Geo\Engine\GeometryEngine;
-use HeyMoon\MVTTools\Registry\BasicProjectionRegistry;
-use HeyMoon\MVTTools\Service\GridService;
-use HeyMoon\MVTTools\Service\SpatialService;
-use HeyMoon\MVTTools\Service\TileService;
+use HeyMoon\VectorTileDataProvider\Registry\BasicProjectionRegistry;
+use HeyMoon\VectorTileDataProvider\Service\GridService;
+use HeyMoon\VectorTileDataProvider\Service\SpatialService;
+use HeyMoon\VectorTileDataProvider\Service\TileService;
 
 abstract class AbstractServiceFactory
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace HeyMoon\MVTTools\Service;
+namespace HeyMoon\VectorTileDataProvider\Service;
 
-use HeyMoon\MVTTools\Registry\AbstractExportFormatRegistry;
+use HeyMoon\VectorTileDataProvider\Registry\AbstractExportFormatRegistry;
 use Vector_tile\Tile;
 
 class ExportService

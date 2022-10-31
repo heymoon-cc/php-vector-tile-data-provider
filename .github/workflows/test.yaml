@@ -1,10 +1,17 @@
 name: Test
-run-name: ${{ github.actor }} is testing heymoon/mvt-tools
+run-name: ${{ github.actor }} is testing heymoon/vector-tile-data-provider
 on:
   workflow_dispatch: {}
   push:
     paths:
+      - proto
+      - src
+      - test
+      - composer.json
       - Dockerfile
+      - Makefile
+      - phpunit.xml
+      - ruleset.xml
 jobs:
   test:
     runs-on: Linux
