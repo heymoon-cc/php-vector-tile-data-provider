@@ -9,6 +9,7 @@ class WebMercatorProjection extends AbstractProjection
 {
     public const EARTH_RADIUS = 20037508.34;
 
+    /** https://en.wikipedia.org/wiki/E_(mathematical_constant) */
     const E = 2.7182818284;
 
     public const SRID = 3857;

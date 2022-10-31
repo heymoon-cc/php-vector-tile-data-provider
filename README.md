@@ -1,4 +1,4 @@
-# Mapbox vector tiles render library for PHP
+# Mapbox vector tiles library for PHP
 [![PHP Version Require](http://poser.pugx.org/heymoon/vector-tile-data-provider/v)](https://packagist.org/packages/heymoon/vector-tile-data-provider)
 [![PHP Version Require](http://poser.pugx.org/heymoon/vector-tile-data-provider/require/php)](https://packagist.org/packages/heymoon/vector-tile-data-provider)
 [![Test](https://github.com/heymoon-cc/php-vector-tile-data-provider/actions/workflows/test.yaml/badge.svg)](https://github.com/heymoon-cc/php-vector-tile-data-provider/actions/workflows/test.yaml)
@@ -7,14 +7,14 @@
 
 Symfony + Redis demo: **<https://map.heymoon.cc>**
 ---
-![Screenshot](https://repository-images.githubusercontent.com/556105367/9c978d49-51ac-45c1-bfa8-80fdd04ae073)
+![Screenshot](https://repository-images.githubusercontent.com/556105367/1ae4eed2-6718-45ea-909e-16aad3ef7dc9)
 
 Basic [Leaflet](https://leafletjs.com/)-based map example with realtime Symfony backend performance preview.
 When "Use cache" checkbox is not active, `getTileMVT` function is called on each request without any additional static
 caching strategy. With "Use cache" option, backend renders each tile only once and stores results in Redis.
 Two layers are requested separately for benchmarking:
 * Polygons based off 976K GeoJSON with 7 string properties.
-* Lines based off 1.8M GeoJSON with no properties.
+* Lines based off 2.8M GeoJSON with 139 optional properties.
 
 It only has 1 CPU and low RAM at its disposal so please be gentle.
 ## Summary
@@ -24,9 +24,6 @@ to [Mapbox Vector Tile 2.1](https://github.com/mapbox/vector-tile-spec/tree/mast
 frequent source data changes delivery with the lowest latency possible. Process data fast with [GEOS](https://libgeos.org) C/C++ library via
 [PHP integration](https://git.osgeo.org/gitea/geos/php-geos.git) with custom update trigger to fit your needs.
 Perform SRID transformation and Douglas-Peucker simplification faster than ever.
-
-You must explicitly generate protobuf classes from your project root via 
-`protoc --proto_path=./vendor/heymoon/vector-tile-data-provider/proto --php_out=./vendor/heymoon/vector-tile-data-provider/proto/gen ./vendor/heymoon/vector-tile-data-provider/proto/vector_tile.proto`.
 ___
 Additional: convert MVT tiles to SVG (debug purposes only, not designed for production).
 Install [meyfa/php-svg](https://github.com/meyfa/php-svg) to use this feature.
@@ -58,6 +55,10 @@ functions can be called directly, it's much easier to scale.
 ## Installation
 `composer require heymoon/vector-tile-data-provider`
 
+You must explicitly generate protobuf classes from your project root:
+
+`protoc --proto_path=./vendor/heymoon/vector-tile-data-provider/proto --php_out=./vendor/heymoon/vector-tile-data-provider/proto/gen ./vendor/heymoon/vector-tile-data-provider/proto/vector_tile.proto`
+
 Install `php-geos` and `php-protobuf` extensions for best performance. Example Dockerfile for
 [Alpine 3.16 with PHP 8.1](https://hub.docker.com/layers/library/php/8.1-alpine3.16/images/sha256-298daac152760e2510ff283b0785c8feef72a2b134b27af918a80e40f26c1bb8):
 ```Dockerfile
@@ -73,10 +74,12 @@ RUN pecl install protobuf \
 	./autogen.sh && ./configure && make && \
 	echo "extension=/usr/src/php/ext/geos/modules/geos.so" > /usr/local/etc/php/conf.d/docker-php-ext-geos.ini
 RUN apk del -f .build-deps && rm -rf /tmp/* /var/cache/apk/*
+# run "composer install" and then...
+RUN protoc --proto_path=./vendor/heymoon/vector-tile-data-provider/proto --php_out=./vendor/heymoon/vector-tile-data-provider/proto/gen ./vendor/heymoon/vector-tile-data-provider/proto/vector_tile.proto
 ```
 
 ## Provides
-* `HeyMoon\VectorTileDataProvider\Entity\Source` instances initialized by `HeyMoon\VectorTileDataProvider\Factory\SourceFactory` for easy data load
+* `HeyMoon\VectorTileDataProvider\Entity\Source` and `Entity\SourceProxy` (storing geometries as WKB until evaluated) instances initialized by `HeyMoon\VectorTileDataProvider\Factory\SourceFactory` for easy data load
 from `Brick\Geo\IO\GeoJSON\FeatureCollection` or manually populated `Brick\Geo\Geometry` objects.
 * `HeyMoon\VectorTileDataProvider\Service\SpatialService` for cheap spatial system transformation.
 * `HeyMoon\VectorTileDataProvider\Service\GridService` and resulting `HeyMoon\VectorTileDataProvider\Entity\Grid` instance for filtering geometries
@@ -87,7 +90,7 @@ RAM, but could be completed much faster than full result generation.
 [Mapbox Vector Tile 2.1](https://github.com/mapbox/vector-tile-spec/tree/master/2.1) generation, presumably in
 `Grid::iterate` callback or HTTP request, reading required geometries from pre-saved `GridService` groups.
 Geometry simplification is performed only on `TileService::getTileMVT`.
-* `HeyMoon\VectorTileDataProvider\Service` for basic export to `.mvt`, to serve tileset as static files via NGINX,
+* `HeyMoon\VectorTileDataProvider\Service\ExportService` for basic export to `.mvt`, to serve tileset as static files via NGINX,
 or `.svg` for result preview.
 * `HeyMoon\VectorTileDataProvider\Factory\TileFactory` for parsing and merging ready vector tiles.
 
@@ -111,6 +114,7 @@ surface from WGS 84 to the required spatial system and the reverse transformatio
 ### DI configuration:
 ```yaml
 services:
+  Brick\Geo\IO\GeoJSONReader: ~
   Brick\Geo\Engine\GeometryEngine:
     class: 'Brick\Geo\Engine\GEOSEngine'
   HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory: ~
@@ -170,7 +174,7 @@ class ExportCommand extends Command
             $source->addCollection('export', $this->geoJSONReader->read(file_get_contents($input->getArgument('in'))));
             $grid = $this->gridService->getGrid($source, $input->getOption('zoom') ?? 0);
             $path = $input->getArgument('out');
-            $type = $input->getOption('t') ?? 'mvt';
+            $type = $input->getOption('type') ?? 'mvt';
             $grid->iterate(fn (TilePosition $position, array $data) =>
                 $this->exportService->dump(
                     $this->tileService->getTileMVT($data, $position), "$path/$position.$type")

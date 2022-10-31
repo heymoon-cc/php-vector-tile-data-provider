@@ -8,10 +8,8 @@ use Brick\Geo\Exception\GeometryIOException;
 use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
-use HeyMoon\VectorTileDataProvider\Entity\Source;
+use HeyMoon\VectorTileDataProvider\Entity\AbstractSource;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
-use HeyMoon\VectorTileDataProvider\Entity\Layer;
-use HeyMoon\VectorTileDataProvider\Entity\Feature;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 
 class TilePartition
@@ -19,7 +17,7 @@ class TilePartition
     private function __construct(private readonly TilePosition $position, private readonly array $shapes) {}
 
     /**
-     * @param Source $source
+     * @param AbstractSource $source
      * @param string $fixture
      * @return static
      * @throws CoordinateSystemException
@@ -28,7 +26,7 @@ class TilePartition
      * @throws UnexpectedGeometryException
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public static function load(Source $source, string $fixture): static
+    public static function load(AbstractSource $source, string $fixture): static
     {
         $data = json_decode($fixture, true);
         $layer = $source->getLayer('test');

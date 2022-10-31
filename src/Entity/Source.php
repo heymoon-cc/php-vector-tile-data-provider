@@ -10,48 +10,10 @@ use Countable;
 use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
 use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 
-class Source implements Countable
+class Source extends AbstractSource
 {
-    /** @var Layer[] */
-    private array $layers = [];
-
-    public function __construct(private readonly GeometryCollectionFactory $geometryCollectionFactory) {}
-
-    /**
-     * @throws CoordinateSystemException
-     * @throws UnexpectedGeometryException
-     */
-    public function add(string $name, Geometry $geometry, array $properties = [], int $minZoom = 0, ?int $id = null): self
+    protected function createLayer(string $name): AbstractLayer
     {
-        $this->getLayer($name)->add($geometry, $properties, $minZoom, $id);
-        return $this;
-    }
-
-    /**
-     * @throws CoordinateSystemException
-     * @throws UnexpectedGeometryException
-     */
-    public function addCollection(string $name, FeatureCollection $collection, int $minZoom = 0, int $srid = WorldGeodeticProjection::SRID): self
-    {
-        $this->getLayer($name)->addCollection($collection, $minZoom, $srid);
-        return $this;
-    }
-
-    public function getLayer(string $name): Layer
-    {
-        return $this->layers[$name] ?? ($this->layers[$name] = new Layer($name, $this, $this->geometryCollectionFactory));
-    }
-
-    /**
-     * @return Feature[]
-     */
-    public function getFeatures(): array
-    {
-        return array_merge(...array_map(fn(Layer $layer) => $layer->getFeatures(), array_values($this->layers)));
-    }
-
-    public function count(): int
-    {
-        return array_reduce($this->layers, fn(int $c, Layer $layer) => $c + $layer->count(), 0);
+        return new Layer($name, $this, $this->geometryCollectionFactory);
     }
 }

@@ -1,10 +1,10 @@
 {
     "name": "heymoon/vector-tile-data-provider",
-    "version": "1.0.0",
-    "description": "Serve or write Mapbox Vector Tile 2.1",
+    "version": "1.0.1",
+    "description": "Serve, write and read Mapbox Vector Tile 2.1",
     "type": "library",
     "license": "MIT",
-    "keywords": ["vt-pbf"],
+    "keywords": ["vt-pbf", "mvt"],
     "autoload": {
         "psr-4": {
             "HeyMoon\\VectorTileDataProvider\\": "src/",
@@ -37,7 +37,7 @@
     "suggest": {
         "meyfa/php-svg": "Export MVT to SVG",
         "ext-geos": "Update tiles with the best performance",
-        "php-protobuf": "Binary library for optimal protobuf encoding"
+        "ext-protobuf": "Binary library for optimal protobuf encoding"
     },
     "scripts": {
         "pre-autoload-dump": [

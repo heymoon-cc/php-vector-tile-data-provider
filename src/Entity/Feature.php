@@ -6,6 +6,7 @@ use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\IO\GeoJSON\Feature as GeoJSONFeature;
+use Brick\Geo\Proxy\ProxyInterface;
 use Stringable;
 
 class Feature extends AbstractSourceComponent implements Stringable
@@ -17,7 +18,7 @@ class Feature extends AbstractSourceComponent implements Stringable
      * @throws UnexpectedGeometryException
      */
     public function __construct(
-        private readonly Layer    $layer,
+        private readonly AbstractLayer    $layer,
         private Geometry $geometry,
         private readonly array    $parameters = [],
         private readonly int      $minZoom = 0,
@@ -47,7 +48,7 @@ class Feature extends AbstractSourceComponent implements Stringable
      */
     public function getGeometry(): Geometry
     {
-        return $this->geometry;
+        return $this->geometry instanceof ProxyInterface ? clone $this->geometry : $this->geometry;
     }
 
     protected function setGeometry(Geometry $geometry): self
@@ -75,9 +76,9 @@ class Feature extends AbstractSourceComponent implements Stringable
     }
 
     /**
-     * @return Layer
+     * @return AbstractLayer
      */
-    public function getLayer(): Layer
+    public function getLayer(): AbstractLayer
     {
         return $this->layer;
     }

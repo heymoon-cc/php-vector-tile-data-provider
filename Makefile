@@ -5,12 +5,18 @@ test:
 	./vendor/bin/phpunit
 
 cache:
+	docker pull heymoon/php-vector-tile-data-provider-tester-builder || true
 	docker pull heymoon/php-vector-tile-data-provider-tester || true
 
 image: cache
-	docker build --cache-from=heymoon/php-vector-tile-data-provider-tester -t heymoon/php-vector-tile-data-provider-tester .
+	docker build --cache-from=heymoon/php-vector-tile-data-provider-tester-builder --target builder \
+		-t heymoon/php-vector-tile-data-provider-tester-builder tests/runtime
+	docker build --cache-from=heymoon/php-vector-tile-data-provider-tester-builder \
+ 		--cache-from=heymoon/php-vector-tile-data-provider-tester --target runtime \
+		-t heymoon/php-vector-tile-data-provider-tester tests/runtime
 
 push: image
+	docker push heymoon/php-vector-tile-data-provider-tester-builder
 	docker push heymoon/php-vector-tile-data-provider-tester
 
 composer: clean.container
@@ -28,6 +34,7 @@ clean.container:
 clean: clean.container
 	docker image rm php:8.1-alpine3.16 2> /dev/null || true  && \
 	docker image rm composer 2> /dev/null || true && \
+	docker image rm heymoon/php-vector-tile-data-provider-tester-builder 2> /dev/null || true && \
 	docker image rm heymoon/php-vector-tile-data-provider-tester 2> /dev/null || true && \
 	(rm -rf "test-reports" 2> /dev/null || sudo rm -rf "test-reports" || true) && \
 	(rm -rf vendor 2> /dev/null || sudo rm -rf vendor || true) && \

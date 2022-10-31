@@ -71,7 +71,8 @@ class GridTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getFeatureParameters
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::asGeoJSONFeature
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getId
-     * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractSource::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::createLayer
      * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getEngine
      * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getSourceFactory
      * @covers \HeyMoon\VectorTileDataProvider\Factory\GEOSServiceFactory::createEngine
@@ -127,7 +128,8 @@ class GridTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getGeometry
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getMinZoom
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::setGeometry
-     * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractSource::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::createLayer
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::addCollection
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::getLayer
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::getFeatures

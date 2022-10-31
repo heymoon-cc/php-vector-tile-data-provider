@@ -69,7 +69,8 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Layer::getFeatures
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Layer::getSource
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Layer::addFeature
-     * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractSource::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::createLayer
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getId
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::getLayer
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::setGeometry
@@ -196,7 +197,8 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::latitudeFromWGS84
      * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::longitudeFromWGS84
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getId
-     * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractSource::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::createLayer
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Layer::getSource
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Layer::addFeature
      * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getSourceFactory
