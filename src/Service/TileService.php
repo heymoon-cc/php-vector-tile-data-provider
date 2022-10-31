@@ -372,30 +372,25 @@ class TileService
             }
             $simplified = [];
             foreach ($shapesByTypes as $type => $items) {
-                if (!array_key_exists($type, $simplified)) {
-                    $simplified[$type] = [];
-                }
-                $simplified[$type][] = $this->geometryEngine->simplify(
+                $simplified[$type] = $this->geometryEngine->simplify(
                     count($items) > 1 ? $this->geometryCollectionFactory->get($items) : array_shift($items), $tolerance
                 );
             }
-            foreach ($simplified as $type => $byType) {
-                foreach ($byType as $collection) {
-                    foreach ($collection instanceof GeometryCollection ? $collection->geometries() : [$collection]
-                             as $item) {
-                        $id = array_shift($idsByType[$key][$type]);
-                        if ($item instanceof Curve) {
-                            if ($this->geometryEngine->length($item) < $tolerance) {
-                                continue;
-                            }
+            foreach ($simplified as $type => $collection) {
+                foreach ($collection instanceof GeometryCollection ? $collection->geometries() : [$collection]
+                         as $item) {
+                    $id = array_shift($idsByType[$key][$type]);
+                    if ($item instanceof Curve) {
+                        if ($this->geometryEngine->length($item) < $tolerance) {
+                            continue;
                         }
-                        $result->add(
-                            $item,
-                            $currentParameters,
-                            0,
-                            $id
-                        );
                     }
+                    $result->add(
+                        $item,
+                        $currentParameters,
+                        0,
+                        $id
+                    );
                 }
             }
         }
