@@ -5,6 +5,20 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/14e051ef07dc37acca40/maintainability)](https://codeclimate.com/github/heymoon-cc/php-vector-tile-data-provider/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/14e051ef07dc37acca40/test_coverage)](https://codeclimate.com/github/heymoon-cc/php-vector-tile-data-provider/test_coverage)
 
+Symfony + Redis demo: **<https://map.heymoon.cc>**
+---
+![Screenshot](https://repository-images.githubusercontent.com/556105367/9c978d49-51ac-45c1-bfa8-80fdd04ae073)
+
+Basic [Leaflet](https://leafletjs.com/)-based map example with realtime Symfony backend performance preview.
+When "Use cache" checkbox is not active, `getTileMVT` function is called on each request without any additional static
+caching strategy. With "Use cache" option, backend renders each tile only once and stores results in Redis.
+Two layers are requested separately for benchmarking:
+* Polygons based off 976K GeoJSON with 7 string properties.
+* Lines based off 1.8M GeoJSON with no properties.
+
+It only has 1 CPU and low RAM at its disposal so please be gentle.
+## Summary
+
 Convert [OpenGIS](https://www.ogc.org/standards/sfa) data loaded by [brick/geo](https://github.com/brick/geo) directly
 to [Mapbox Vector Tile 2.1](https://github.com/mapbox/vector-tile-spec/tree/master/2.1) format. Focused on
 frequent source data changes delivery with the lowest latency possible. Process data fast with [GEOS](https://libgeos.org) C/C++ library via
@@ -76,18 +90,6 @@ Geometry simplification is performed only on `TileService::getTileMVT`.
 * `HeyMoon\VectorTileDataProvider\Service` for basic export to `.mvt`, to serve tileset as static files via NGINX,
 or `.svg` for result preview.
 * `HeyMoon\VectorTileDataProvider\Factory\TileFactory` for parsing and merging ready vector tiles.
-
-## Demo
-**<https://map.heymoon.cc>**
----
-Basic [Leaflet](https://leafletjs.com/)-based map example with realtime Symfony backend performance preview.
-When "Use cache" checkbox is not active, `getTileMVT` function is called on each request without any additional static
-caching strategy. With "Use cache" option, backend renders each tile only once and stores results in Redis.
-Two layers are requested separately for benchmarking:
-* Polygons based off 976K GeoJSON with 7 string properties.
-* Lines based off 1.8M GeoJSON with no properties.
-
-It only has 1 CPU and low RAM at its disposal so please be gentle.
 
 ## Spatial systems
 By default, grid is expected to be aligned with the
