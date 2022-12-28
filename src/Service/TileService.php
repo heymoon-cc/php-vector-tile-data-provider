@@ -18,9 +18,9 @@ use Brick\Geo\Point;
 use Brick\Geo\Polygon;
 use ErrorException;
 use Exception;
+use HeyMoon\VectorTileDataProvider\Entity\AbstractLayer;
 use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
 use HeyMoon\VectorTileDataProvider\Factory\SourceFactory;
-use HeyMoon\VectorTileDataProvider\Entity\Layer;
 use HeyMoon\VectorTileDataProvider\Entity\Feature;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use Vector_tile\Tile;
@@ -325,7 +325,7 @@ class TileService
     }
 
     /**
-     * @param Layer $layer
+     * @param AbstractLayer $layer
      * @param Feature[] $data
      * @param float $tolerance
      * @return Feature[]
@@ -333,7 +333,7 @@ class TileService
      * @throws UnexpectedGeometryException
      * @throws GeometryEngineException
      */
-    protected function simplify(Layer $layer, array $data, float $tolerance): array
+    protected function simplify(AbstractLayer $layer, array $data, float $tolerance): array
     {
         /** @var Geometry[][] $shapeByParameters */
         $shapeByParameters = [];
@@ -394,7 +394,9 @@ class TileService
                 }
             }
         }
-        return $result->getFeatures();
+        $features = $result->getFeatures();
+        usort($features, fn(Feature $a, Feature $b) => $b->getId() - $a->getId());
+        return $features;
     }
 
     /**
