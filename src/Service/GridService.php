@@ -2,6 +2,7 @@
 
 namespace HeyMoon\VectorTileDataProvider\Service;
 
+use Brick\Geo\Engine\GeometryEngine;
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\EmptyGeometryException;
 use Brick\Geo\Exception\GeometryEngineException;
@@ -21,7 +22,8 @@ use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
 class GridService
 {
     public function __construct(
-        private readonly SpatialService $spatialService
+        private readonly SpatialService $spatialService,
+        private readonly ?GeometryEngine $geometryEngine = null
     ) {}
 
     /**
@@ -33,7 +35,7 @@ class GridService
      * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getGrid(AbstractSource $source, int $zoom, ?callable $filter = null): Grid
+    public function getGrid(AbstractSource $source, int $zoom, ?callable $filter = null, ?float $buffer = null): Grid
     {
         $grid = [];
         $tileWidth = GeometryHelper::getTileWidth($zoom);
@@ -43,7 +45,8 @@ class GridService
             }
             $collection = $feature->getGeometry();
             foreach ($collection instanceof GeometryCollection ? $collection->geometries() : [$collection] as $geometry) {
-                $bounds = $geometry->getBoundingBox();
+                $bounds = ($buffer ? $this->geometryEngine->buffer($geometry, $buffer * $tileWidth) : $geometry)
+                    ->getBoundingBox();
                 $westColumn = $this->getColumn($bounds->getSouthWest(), $tileWidth);
                 $westRow = $this->getRow($bounds->getSouthWest(), $tileWidth);
                 $eastColumn = $this->getColumn($bounds->getNorthEast(), $tileWidth);
