@@ -17,8 +17,21 @@ abstract class AbstractSourceComponent
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function setGeometry(Geometry $geometry): self
+    protected function setGeometry(?Geometry $geometry): self
     {
         return $this;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected function setCollection(array $collection): self
+    {
+        return $this;
+    }
+
+    protected function getCollection(): array
+    {
+        return [];
     }
 }

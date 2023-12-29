@@ -29,7 +29,7 @@ abstract class AbstractLayer extends AbstractSourceComponent implements ArrayAcc
      */
     public function add(Geometry $geometry, array $properties = [], int $minZoom = 0, ?int $id = null): self
     {
-        new Feature($this, $geometry, $properties, $minZoom, $id);
+        new Feature($this->geometryCollectionFactory, $this, $geometry, $properties, $minZoom, $id);
         return $this;
     }
 
@@ -121,14 +121,15 @@ abstract class AbstractLayer extends AbstractSourceComponent implements ArrayAcc
     {
         $exists = $id && array_key_exists($id, $this->features);
         if ($exists) {
-            $target = $this->features[$id]->getGeometry();
+            $target = $this->features[$id]->getCollection() ?: $this->features[$id]->getGeometry();
             $add = $feature->getGeometry();
             /** @var Geometry[] $collection */
             $collection = array_merge(
-                $target instanceof GeometryCollection ? $target->geometries() : [$target],
+                is_array($target) ? $target : ($target instanceof GeometryCollection ?
+                    $target->geometries() : [$target]),
                 $add instanceof GeometryCollection ? $add->geometries() : [$add]
             );
-            $this->features[$id] = $feature->setGeometry($this->geometryCollectionFactory->get($collection));
+            $this->features[$id] = $feature->setGeometry(null)->setCollection($collection);
             return $id;
         }
         $id || empty($this->features) ?

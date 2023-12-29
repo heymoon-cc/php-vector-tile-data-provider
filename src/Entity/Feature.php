@@ -7,23 +7,29 @@ use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\IO\GeoJSON\Feature as GeoJSONFeature;
 use Brick\Geo\Proxy\ProxyInterface;
+use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
 use Stringable;
 
 class Feature extends AbstractSourceComponent implements Stringable
 {
     private int $id;
 
+    private ?Geometry $geometry;
+    private array $collection = [];
+
     /**
      * @throws CoordinateSystemException
      * @throws UnexpectedGeometryException
      */
     public function __construct(
+        private readonly GeometryCollectionFactory $geometryCollectionFactory,
         private readonly AbstractLayer    $layer,
-        private Geometry $geometry,
+        Geometry $geometry,
         private readonly array    $parameters = [],
         private readonly int      $minZoom = 0,
         ?int $id = null
     ) {
+        $this->geometry = $geometry;
         $this->id = $this->layer->addFeature($this, $id);
     }
 
@@ -45,16 +51,30 @@ class Feature extends AbstractSourceComponent implements Stringable
 
     /**
      * @return Geometry
+     * @throws CoordinateSystemException
+     * @throws UnexpectedGeometryException
      */
     public function getGeometry(): Geometry
     {
-        return $this->geometry instanceof ProxyInterface ? clone $this->geometry : $this->geometry;
+        return $this->geometry ? ($this->geometry instanceof ProxyInterface ? clone $this->geometry : $this->geometry) :
+            $this->geometry = $this->geometryCollectionFactory->get($this->collection);
     }
 
-    protected function setGeometry(Geometry $geometry): self
+    protected function setGeometry(?Geometry $geometry): self
     {
         $this->geometry = $geometry;
         return $this;
+    }
+
+    protected function setCollection(array $collection): self
+    {
+        $this->collection = $collection;
+        return $this;
+    }
+
+    protected function getCollection(): array
+    {
+        return $this->collection;
     }
 
     /**

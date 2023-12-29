@@ -150,6 +150,8 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getLayer
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getParameters
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::setGeometry
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::setCollection
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getCollection
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::addCollection
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::getLayer
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::getFeatures
