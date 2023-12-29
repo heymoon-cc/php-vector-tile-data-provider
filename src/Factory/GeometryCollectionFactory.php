@@ -22,7 +22,8 @@ class GeometryCollectionFactory
     {
         $first = array_shift($geometries);
         $collectionClass = $this->collectionClass[$first::class] ?? $this->getCollectionClass($first);
-        return $collectionClass::of($first, ...$geometries)->withSRID($first->SRID());
+        return $collectionClass::of($first, ...array_filter($geometries,
+            fn(Geometry $geometry) => $geometry::class === $first::class))->withSRID($first->SRID());
     }
 
     protected function getCollectionClass(Geometry $geometry): string
