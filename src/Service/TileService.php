@@ -23,6 +23,7 @@ use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
 use HeyMoon\VectorTileDataProvider\Factory\SourceFactory;
 use HeyMoon\VectorTileDataProvider\Entity\Feature;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
+use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
 use Vector_tile\Tile;
 
 /**
@@ -386,7 +387,7 @@ class TileService
                         }
                     }
                     $result->add(
-                        $item,
+                        $item->withSRID(WebMercatorProjection::SRID),
                         $currentParameters,
                         0,
                         $id
