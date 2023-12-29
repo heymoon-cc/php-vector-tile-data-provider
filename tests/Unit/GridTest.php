@@ -100,7 +100,7 @@ class GridTest extends BaseTestCase
             foreach ($data as $item) {
                 $this->assertArrayNotHasKey('id', $item->getParameters());
                 $feature = $item->asGeoJSONFeature();
-                $this->assertObjectHasAttribute('id', $feature->getProperties());
+                $this->assertObjectHasProperty('id', $feature->getProperties());
                 $this->assertEquals($item->getId(), $feature->getProperties()->id);
             }
             $i++;
