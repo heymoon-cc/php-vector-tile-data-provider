@@ -400,11 +400,20 @@ class TileService
         return $features;
     }
 
+    protected function getValue(Tile\Value $value): string|int|null|float
+    {
+        return $value->hasStringValue() ? $value->getStringValue() :
+            ($value->hasUintValue() ? $value->getUintValue() : ($value->hasSintValue() ? $value->getSintValue() :
+                ($value->hasIntValue() ? $value->getIntValue() : ($value->hasFloatValue() ? $value->getFloatValue() :
+                        ($value->hasDoubleValue() ? $value->getDoubleValue() : null)))));
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected function addValues(array $parameters, array &$keys, array &$values): array
     {
+        /** @var Tile\Value[] $values */
         $new = array_keys($parameters);
         foreach ($new as $key) {
             if (!in_array($key, $keys)) {
@@ -418,8 +427,8 @@ class TileService
                 continue;
             }
             foreach ($values as $tag => $existing) {
-                if (($value == ($this->valuesCache[$key] ?? null)) ||
-                    in_array($value, [$existing->getStringValue(), $existing->getUintValue()], true)) {
+                if (($value === ($this->valuesCache[$key] ?? null)) ||
+                    ($value === $this->getValue($existing))) {
                     $tags[] = $id;
                     $tags[] = $tag;
                     continue 2;

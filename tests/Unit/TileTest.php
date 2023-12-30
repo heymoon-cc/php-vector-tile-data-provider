@@ -58,6 +58,7 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Service\SpatialService::check
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::__construct
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::addValues
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getValue
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::createLayer
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::encodeCommand
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::encodeValue
@@ -115,6 +116,7 @@ class TileTest extends BaseTestCase
      * @covers  \HeyMoon\VectorTileDataProvider\Factory\TileFactory::__construct
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::__construct
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::addValues
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getValue
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::createLayer
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getExtent
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getValues
@@ -187,6 +189,7 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Service\SpatialService::transformPolygon
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::__construct
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::addValues
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getValue
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::createLayer
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::encodeCommand
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::encodeValue
