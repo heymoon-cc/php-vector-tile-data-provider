@@ -1,6 +1,6 @@
 {
     "name": "heymoon/vector-tile-data-provider",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "Serve, write and read Mapbox Vector Tile 2.1",
     "type": "library",
     "license": "MIT",
@@ -25,7 +25,7 @@
     ],
     "require": {
         "php": ">=8.1",
-        "brick/geo": "^0.8.1",
+        "brick/geo": "^0.8|^0.9",
         "ext-zlib": "*"
     },
     "require-dev": {

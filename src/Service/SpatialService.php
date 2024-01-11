@@ -39,7 +39,7 @@ class SpatialService extends AbstractSourceComponent
     public function check(array $features, int $srid): array
     {
         return array_map(fn(Feature $feature) =>
-            $feature->getGeometry()->SRID() === $srid ? $feature : $feature->setGeometry(
+        $feature->getGeometry()->SRID() === $srid ? $feature : $feature->setGeometry(
             $this->transform($feature->getGeometry(), $srid)),
             $features
         );
@@ -96,13 +96,16 @@ class SpatialService extends AbstractSourceComponent
      * @throws CoordinateSystemException
      * @throws UnexpectedGeometryException
      */
-    public function transformMultiPoint(MultiPoint $geometry, int $srid): MultiPoint
+    public function transformMultiPoint(MultiPoint $geometry, int $srid, ?int $parentSRID = null): MultiPoint
     {
         if ($this->projectionRegistry->get($srid)->isAligned($geometry)) {
             return $geometry;
         }
         return MultiPoint::of(
-            ...array_map(fn(Point $point) => $this->transformPoint($point, $srid), $geometry->geometries())
+            ...array_map(fn(Point $point) =>
+            $this->transformPoint($point->withSRID($parentSRID ?? $geometry->SRID()),
+                $srid),
+                $geometry->geometries())
         )->withSRID($srid);
     }
 
@@ -110,13 +113,14 @@ class SpatialService extends AbstractSourceComponent
      * @throws CoordinateSystemException
      * @throws InvalidGeometryException
      */
-    public function transformLine(LineString $line, int $srid): LineString
+    public function transformLine(LineString $line, int $srid, ?int $parentSRID = null): LineString
     {
         if ($this->projectionRegistry->get($srid)->isAligned($line)) {
             return $line;
         }
-        return LineString::of(...array_map(fn (Point $point) => $this->transformPoint($point, $srid), $line->points()))
-            ->withSRID($srid);
+        return LineString::of(...array_map(fn (Point $point) => $this->transformPoint(
+            $point->withSRID($parentSRID ?? $line->SRID()), $srid),
+            $line->points()))->withSRID($srid);
     }
 
     /**
@@ -124,13 +128,14 @@ class SpatialService extends AbstractSourceComponent
      * @throws UnexpectedGeometryException
      * @throws InvalidGeometryException
      */
-    public function transformMultiLine(MultiLineString $geometry, int $srid): MultiLineString
+    public function transformMultiLine(MultiLineString $geometry, int $srid, ?int $parentSRID = null): MultiLineString
     {
         if ($this->projectionRegistry->get($srid)->isAligned($geometry)) {
             return $geometry;
         }
         return MultiLineString::of(
-            ...array_map(fn (LineString $line) => $this->transformLine($line, $srid),
+            ...array_map(fn (LineString $line) => $this->transformLine($line, $srid,
+                $parentSRID ?? $geometry->SRID()),
                 $geometry->geometries())
         )->withSRID($srid);
     }
@@ -140,12 +145,13 @@ class SpatialService extends AbstractSourceComponent
      * @throws EmptyGeometryException
      * @throws InvalidGeometryException
      */
-    public function transformPolygon(Polygon $polygon, int $srid): Polygon
+    public function transformPolygon(Polygon $polygon, int $srid, ?int $parentSRID = null): Polygon
     {
         if ($this->projectionRegistry->get($srid)->isAligned($polygon)) {
             return $polygon;
         }
-        return Polygon::of($this->transformLine($polygon->exteriorRing(), $srid))
+        return Polygon::of($this->transformLine($polygon->exteriorRing(), $srid,
+            $parentSRID ?? $polygon->SRID()))
             ->withSRID($srid);
     }
 
@@ -155,13 +161,14 @@ class SpatialService extends AbstractSourceComponent
      * @throws InvalidGeometryException
      * @throws UnexpectedGeometryException
      */
-    public function transformMultiPolygon(MultiPolygon $geometry, int $srid): MultiPolygon
+    public function transformMultiPolygon(MultiPolygon $geometry, int $srid, ?int $parentSRID = null): MultiPolygon
     {
         if ($this->projectionRegistry->get($srid)->isAligned($geometry)) {
             return $geometry;
         }
         return MultiPolygon::of(
-            ...array_map(fn (Polygon $polygon) => $this->transformPolygon($polygon, $srid),
+            ...array_map(fn (Polygon $polygon) => $this->transformPolygon($polygon, $srid,
+                $parentSRID ?? $geometry->SRID()),
                 $geometry->geometries()
             )
         )->withSRID($srid);
