@@ -41,8 +41,6 @@ class TileService
     public const LINE_TO = 2;
     public const CLOSE_PATH = 7;
 
-    private array $valuesCache = [];
-
     /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
@@ -85,11 +83,6 @@ class TileService
             }
             $byLayer[$name][] = $item;
         }
-        $this->valuesCache = [];
-        $keys = [];
-        /** @var Tile\Value[] $values */
-        $values = [];
-        $features = [];
         $minPoint = $position->getMinPoint();
         $maxPoint = $position->getMaxPoint();
         $border = $this->geometryEngine->envelope(MultiPoint::of($position->getMinPoint(), $position->getMaxPoint()));
@@ -99,6 +92,11 @@ class TileService
         $tolerance = $width / $extent;
         $layers = [];
         foreach ($byLayer as $name => $data) {
+            $features = [];
+            $keys = [];
+            /** @var Tile\Value[] $values */
+            $values = [];
+            $valuesCache = [];
             foreach ($tolerance > $this->minTolerance ?
                          $this->simplify($shapeLayers[$name], $data, $tolerance) :
                          $data as $item) {
@@ -146,7 +144,7 @@ class TileService
                                 $keys[] = $key;
                             }
                         }
-                        $feature->setTags($this->addValues($parameters, $keys, $values));
+                        $feature->setTags($this->addValues($parameters, $keys, $values, $valuesCache));
                         $tileGeometry = [];
                         $tileGeometry[] = $this->encodeCommand(static::MOVE_TO);
                         $newX = (int)round(($previous->x() - $minPoint->x()) * $scale);
@@ -190,7 +188,6 @@ class TileService
         }
         $tile = new Tile();
         $tile->setLayers($layers);
-        $this->valuesCache = [];
         return $tile;
     }
 
@@ -205,7 +202,6 @@ class TileService
 
     public function mergeLayers(Tile $tile): Tile
     {
-        $this->valuesCache = [];
         $oldLayers = [];
         $extent = $this->getExtent($tile);
         foreach ($tile->getLayers() as $oldLayer) {
@@ -220,6 +216,7 @@ class TileService
             $newLayer = $this->createLayer($name, $extent);
             $keys = [];
             $values = [];
+            $valuesCache = [];
             $features = [];
             $hashes = [];
             foreach ($layers as $layer) {
@@ -244,7 +241,7 @@ class TileService
                     $hashes[] = $hash;
                     $newFeature = new Tile\Feature();
                     $parameters = $this->getValues($layer, $feature);
-                    $tags = $this->addValues($parameters, $keys, $values);
+                    $tags = $this->addValues($parameters, $keys, $values, $valuesCache);
                     $newFeature->setTags($tags);
                     $newFeature->setId($feature->getId());
                     $newFeature->setType($feature->getType());
@@ -259,7 +256,6 @@ class TileService
         }
         $newTile = new Tile();
         $newTile->setLayers($result);
-        $this->valuesCache = [];
         return $newTile;
     }
 
@@ -411,7 +407,7 @@ class TileService
     /**
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    protected function addValues(array $parameters, array &$keys, array &$values): array
+    protected function addValues(array $parameters, array &$keys, array &$values, array &$valuesCache): array
     {
         /** @var Tile\Value[] $values */
         $new = array_keys($parameters);
@@ -427,7 +423,7 @@ class TileService
                 continue;
             }
             foreach ($values as $tag => $existing) {
-                if (($value === ($this->valuesCache[$key] ?? null)) ||
+                if (($value === ($valuesCache[$key] ?? null)) ||
                     ($value === $this->getValue($existing))) {
                     $tags[] = $id;
                     $tags[] = $tag;
@@ -463,7 +459,7 @@ class TileService
                 continue;
             }
             $values[] = $protoValue;
-            $this->valuesCache[] = $value;
+            $valuesCache[] = $value;
             $tags[] = $id;
             $tags[] = array_key_last($values);
         }
