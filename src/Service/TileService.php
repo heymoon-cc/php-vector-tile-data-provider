@@ -137,14 +137,8 @@ class TileService
                         } catch (EmptyGeometryException) {
                             continue;
                         }
-                        $parameters = $item->getParameters();
-                        $new = array_keys($parameters);
-                        foreach ($new as $key) {
-                            if (!in_array($key, $keys)) {
-                                $keys[] = $key;
-                            }
-                        }
-                        $feature->setTags($this->addValues($parameters, $keys, $values, $valuesCache));
+                        $feature->setTags($this->addValues($item->getParameters(),
+                            $keys, $values, $valuesCache));
                         $tileGeometry = [];
                         $tileGeometry[] = $this->encodeCommand(static::MOVE_TO);
                         $newX = (int)round(($previous->x() - $minPoint->x()) * $scale);
@@ -412,7 +406,7 @@ class TileService
         /** @var Tile\Value[] $values */
         $new = array_keys($parameters);
         foreach ($new as $key) {
-            if (!in_array($key, $keys)) {
+            if (!in_array($key, $keys, true) && !is_null($parameters[$key])) {
                 $keys[] = $key;
             }
         }
