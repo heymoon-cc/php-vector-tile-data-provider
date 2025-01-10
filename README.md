@@ -1,6 +1,6 @@
 # Mapbox vector tiles library for PHP
-[![Version](http://poser.pugx.org/heymoon/vector-tile-data-provider/v)](https://packagist.org/packages/heymoon/vector-tile-data-provider)
-[![PHP Version Require](http://poser.pugx.org/heymoon/vector-tile-data-provider/require/php)](https://packagist.org/packages/heymoon/vector-tile-data-provider)
+[![Version](https://poser.pugx.org/heymoon/vector-tile-data-provider/v)](https://packagist.org/packages/heymoon/vector-tile-data-provider)
+[![PHP Version Require](https://poser.pugx.org/heymoon/vector-tile-data-provider/require/php)](https://packagist.org/packages/heymoon/vector-tile-data-provider)
 [![Test](https://github.com/heymoon-cc/php-vector-tile-data-provider/actions/workflows/test.yaml/badge.svg)](https://github.com/heymoon-cc/php-vector-tile-data-provider/actions/workflows/test.yaml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/14e051ef07dc37acca40/maintainability)](https://codeclimate.com/github/heymoon-cc/php-vector-tile-data-provider/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/14e051ef07dc37acca40/test_coverage)](https://codeclimate.com/github/heymoon-cc/php-vector-tile-data-provider/test_coverage)
