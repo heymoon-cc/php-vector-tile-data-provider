@@ -8,8 +8,6 @@ use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Point;
 use HeyMoon\VectorTileDataProvider\Tests\BaseTestCase;
-use HeyMoon\VectorTileDataProvider\Service\SpatialService;
-use HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection;
 
 class SpatialTest extends BaseTestCase
 {

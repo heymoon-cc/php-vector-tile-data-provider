@@ -5,7 +5,6 @@ namespace HeyMoon\VectorTileDataProvider\Tests\Unit;
 use Brick\Geo\Exception\GeometryException;
 use Brick\Geo\Point;
 use HeyMoon\VectorTileDataProvider\Entity\AbstractSource;
-use HeyMoon\VectorTileDataProvider\Entity\Source;
 use HeyMoon\VectorTileDataProvider\Tests\BaseTestCase;
 
 abstract class AbstractSourceTest extends BaseTestCase
@@ -40,6 +39,7 @@ abstract class AbstractSourceTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Factory\SourceFactory::create
      * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getGeometryCollectionFactory
      * @throws GeometryException
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function testSource()
     {

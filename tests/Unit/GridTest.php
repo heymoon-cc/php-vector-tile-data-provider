@@ -1,18 +1,15 @@
 <?php
 
-namespace Unit;
+namespace HeyMoon\VectorTileDataProvider\Tests\Unit;
 
 use Brick\Geo\Exception\GeometryEngineException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
-use HeyMoon\VectorTileDataProvider\Entity\Grid;
 use HeyMoon\VectorTileDataProvider\Entity\Feature;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
-use HeyMoon\VectorTileDataProvider\Service\GridService;
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\EmptyGeometryException;
 use Brick\Geo\Exception\GeometryException;
 use Brick\Geo\Exception\InvalidGeometryException;
-use HeyMoon\VectorTileDataProvider\Entity\Source;
 use HeyMoon\VectorTileDataProvider\Tests\BaseTestCase;
 
 class GridTest extends BaseTestCase
@@ -90,12 +87,13 @@ class GridTest extends BaseTestCase
     {
         $service = $this->getGridService();
         $source = $this->getSourceFactory()->create();
-        $source->addCollection('moscow',
-            $this->getGeoJSONReader()->read($this->getFixture('moscow.json.gz'))
+        $source->addCollection('fixture',
+            $this->getGeoFixture()->getFeatureCollection(10, 100)
         );
         $grid = $service->getGrid($source, 10);
         $i = 0;
         $grid->iterate(function (TilePosition $position, array $data) use (&$i) {
+            $this->assertEquals(10, $position->getZoom());
             /** @var Feature[] $data */
             foreach ($data as $item) {
                 $this->assertArrayNotHasKey('id', $item->getParameters());
@@ -105,7 +103,7 @@ class GridTest extends BaseTestCase
             }
             $i++;
         });
-        $this->assertEquals(10, $i);
+        $this->assertEquals(2644, $i);
     }
 
     /**
@@ -173,17 +171,18 @@ class GridTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::isAligned
      * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::latitudeFromWGS84
      * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::longitudeFromWGS84
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function testMultiPoly()
     {
         $service = $this->getGridService();
         $source = $this->getSourceFactory()->create();
-        $source->addCollection('moscow',
-            $this->getGeoJSONReader()->read($this->getFixture('mo.json.gz'))
+        $source->addCollection('fixture',
+            $this->getGeoFixture()->getFeatureCollection(10, 100)
         );
         $grid = $service->getGrid($source, 9);
-        $position = TilePosition::xyzFlip(309, 160, 9);
+        $position = TilePosition::xyzFlip(255, 241, 9);
         $shapes = $grid->get($position);
-        $this->assertCount(92, $shapes);
+        $this->assertCount(3, $shapes);
     }
 }

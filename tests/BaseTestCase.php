@@ -14,6 +14,7 @@ use HeyMoon\VectorTileDataProvider\Service\ExportService;
 use HeyMoon\VectorTileDataProvider\Service\GridService;
 use HeyMoon\VectorTileDataProvider\Service\SpatialService;
 use HeyMoon\VectorTileDataProvider\Service\TileService;
+use HeyMoon\VectorTileDataProvider\Tests\Fixture\GeoFixture;
 use PHPUnit\Framework\TestCase;
 use Vector_tile\Tile;
 use Vector_tile\Tile\Layer;
@@ -22,6 +23,7 @@ abstract class BaseTestCase extends TestCase
 {
     private GEOSServiceFactory $serviceFactory;
     private ExportFormatRegistry $exportFormatRegistry;
+    private GeoFixture $geoFixture;
     private ?TileService $tileService = null;
     private ?ExportService $exportService = null;
     private ?SpatialService $spatialService = null;
@@ -33,6 +35,7 @@ abstract class BaseTestCase extends TestCase
     {
         $this->serviceFactory = new GEOSServiceFactory();
         $this->exportFormatRegistry = new ExportFormatRegistry();
+        $this->geoFixture = new GeoFixture();
         parent::__construct($name, $data, $dataName);
     }
 
@@ -77,6 +80,11 @@ abstract class BaseTestCase extends TestCase
     protected function getTileFactory(): TileFactory
     {
         return $this->tileFactory ?? ($this->tileFactory = new TileFactory($this->getTileService()));
+    }
+
+    protected function getGeoFixture(): GeoFixture
+    {
+        return $this->geoFixture;
     }
 
     protected function getGeoJSONReader(): GeoJSONReader

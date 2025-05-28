@@ -3,7 +3,6 @@
 namespace HeyMoon\VectorTileDataProvider\Tests\Unit;
 
 use Exception;
-use HeyMoon\VectorTileDataProvider\Service\ExportService;
 use HeyMoon\VectorTileDataProvider\Tests\BaseTestCase;
 use SVG\SVG;
 

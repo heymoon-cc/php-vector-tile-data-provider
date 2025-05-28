@@ -4,7 +4,7 @@ RUN apk add --no-cache --virtual .build-deps \
     geos-dev \
     geos \
     git && \
-    apk add --no-cache -X https://dl-cdn.alpinelinux.org/alpine/edge/community \
+    apk add --no-cache -X https://dl-cdn.alpinelinux.org/alpine/edge/testing \
         php81-pecl-pcov
 RUN git clone https://git.osgeo.org/gitea/geos/php-geos.git /usr/src/php/ext/geos && cd /usr/src/php/ext/geos && \
     	./autogen.sh && ./configure && make && \

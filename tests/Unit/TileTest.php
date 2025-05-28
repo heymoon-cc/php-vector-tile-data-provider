@@ -6,17 +6,12 @@ use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\EmptyGeometryException;
 use Brick\Geo\Exception\GeometryEngineException;
 use Brick\Geo\Exception\GeometryException;
-use Brick\Geo\Exception\GeometryIOException;
 use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Point;
 use Exception;
-use HeyMoon\VectorTileDataProvider\Helper\GeometryHelper;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
 use HeyMoon\VectorTileDataProvider\Tests\BaseTestCase;
-use HeyMoon\VectorTileDataProvider\Tests\Fixture\TilePartition;
-use HeyMoon\VectorTileDataProvider\Service\TileService;
-use HeyMoon\VectorTileDataProvider\Entity\Source;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use Vector_tile\Tile;
 
@@ -70,7 +65,10 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Layer::getFeatures
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Layer::getSource
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Layer::addFeature
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractLayer::addCollection
      * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractSource::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractSource::addCollection
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractSource::getFeatures
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::createLayer
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getId
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::getLayer
@@ -82,7 +80,6 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory::get
      * @covers \HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory::getCollectionClass
      * @throws CoordinateSystemException
-     * @throws GeometryIOException
      * @throws InvalidGeometryException
      * @throws UnexpectedGeometryException
      * @throws EmptyGeometryException
@@ -92,10 +89,11 @@ class TileTest extends BaseTestCase
     public function testTile()
     {
         $tileService = $this->getTileService();
-        $partition = TilePartition::load(
-            $this->getSourceFactory()->create(), $this->getFixture('partition.json.gz')
+        $partition = $this->getSourceFactory()->create()->addCollection(
+            'fixture',
+            $this->getGeoFixture()->getFeatureCollection(10, 100)
         );
-        $tile = $tileService->getTileMVT($partition->getFeatures(), $partition->getPosition());
+        $tile = $tileService->getTileMVT($partition->getFeatures(), TilePosition::xyz(0, 0, 0));
         $this->assertInstanceOf(Tile::class, $tile);
         $this->assertCount(1, $tile->getLayers());
     }
@@ -113,7 +111,7 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry::addProjection
      * @covers \HeyMoon\VectorTileDataProvider\Registry\BasicProjectionRegistry::supports
      * @covers \HeyMoon\VectorTileDataProvider\Service\SpatialService::__construct
-     * @covers  \HeyMoon\VectorTileDataProvider\Factory\TileFactory::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\TileFactory::__construct
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::__construct
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::addValues
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getValue
@@ -136,8 +134,8 @@ class TileTest extends BaseTestCase
         $merged = $factory->merge($tile, $tile->serializeToString());
         $this->assertCount(2, $tile->getLayers());
         $this->assertCount(1, $merged->getLayers());
-        $this->assertFeaturesCount(21240, $tile);
-        $this->assertFeaturesCount(10594, $merged);
+        $this->assertFeaturesCount(88, $tile);
+        $this->assertFeaturesCount(44, $merged);
     }
 
     /**
@@ -218,18 +216,18 @@ class TileTest extends BaseTestCase
     {
         $tileService = $this->getTileService();
         $source = $this->getSourceFactory()->create();
-        $source->addCollection('moscow',
-            $this->getGeoJSONReader()->read($this->getFixture('moscow.json.gz'))
+        $source->addCollection('fixture',
+            $this->getGeoFixture()->getFeatureCollection(10, 100)
         );
         $shapes = $this->getSpatialService()->check($source->getFeatures(), WebMercatorProjection::SRID);
         $tile = $tileService->getTileMVT($shapes, TilePosition::xyz(1, 1, 1));
         $this->assertInstanceOf(Tile::class, $tile);
         $this->assertCount(1, $tile->getLayers());
-        $this->assertFeaturesCount(33, $tile);
+        $this->assertFeaturesCount(49, $tile);
         $tile = $tileService->getTileMVT($shapes, TilePosition::xyzFlip(618, 320, 10));
         $this->assertInstanceOf(Tile::class, $tile);
         $this->assertCount(1, $tile->getLayers());
-        $this->assertFeaturesCount(43, $tile);
+        $this->assertFeaturesCount(33, $tile);
     }
 
     /**
