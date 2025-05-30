@@ -2,15 +2,15 @@
 
 namespace HeyMoon\VectorTileDataProvider\Service;
 
+use HeyMoon\VectorTileDataProvider\Contract\ExportFormatRegistryInterface;
 use HeyMoon\VectorTileDataProvider\Contract\ExportServiceInterface;
 use HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface;
-use HeyMoon\VectorTileDataProvider\Registry\AbstractExportFormatRegistry;
 use Vector_tile\Tile;
 
 class ExportService implements ExportServiceInterface
 {
     public function __construct(
-        private readonly AbstractExportFormatRegistry $factory,
+        private readonly ExportFormatRegistryInterface $factory,
         private readonly TileServiceInterface $service
     ) {}
 

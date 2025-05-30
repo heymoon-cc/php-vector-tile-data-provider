@@ -2,6 +2,7 @@
 
 namespace HeyMoon\VectorTileDataProvider\Registry;
 
+use HeyMoon\VectorTileDataProvider\Contract\ProjectionRegistryInterface;
 use HeyMoon\VectorTileDataProvider\Spatial\SpatialProjectionInterface;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
 use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
@@ -9,7 +10,7 @@ use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)
  */
-abstract class AbstractProjectionRegistry
+abstract class AbstractProjectionRegistry implements ProjectionRegistryInterface
 {
     private array $projections = [];
 

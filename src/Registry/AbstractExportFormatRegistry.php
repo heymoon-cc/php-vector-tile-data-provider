@@ -2,11 +2,12 @@
 
 namespace HeyMoon\VectorTileDataProvider\Registry;
 
+use HeyMoon\VectorTileDataProvider\Contract\ExportFormatRegistryInterface;
 use HeyMoon\VectorTileDataProvider\Exception\MissingDependencyException;
 use HeyMoon\VectorTileDataProvider\Exception\UnknownFormatException;
 use HeyMoon\VectorTileDataProvider\Export\ExportFormatInterface;
 
-abstract class AbstractExportFormatRegistry
+abstract class AbstractExportFormatRegistry implements ExportFormatRegistryInterface
 {
     /** @var ExportFormatInterface[] */
     protected array $formats = [];
