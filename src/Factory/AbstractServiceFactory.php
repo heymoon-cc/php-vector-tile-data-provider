@@ -13,6 +13,7 @@ abstract class AbstractServiceFactory
     private ?GeometryEngine $engine = null;
     private ?SpatialService $spatial = null;
     private ?SourceFactory $sourceFactory = null;
+    private ?ProxySourceFactory $proxySourceFactory = null;
     private ?GeometryCollectionFactory $geometryCollectionFactory = null;
     private ?GridService $gridService = null;
 
@@ -38,6 +39,12 @@ abstract class AbstractServiceFactory
     public function getSourceFactory(): SourceFactory
     {
         return $this->sourceFactory ?? ($this->sourceFactory = new SourceFactory($this->getGeometryCollectionFactory()));
+    }
+
+    public function getProxySourceFactory(): ProxySourceFactory
+    {
+        return $this->proxySourceFactory ?? ($this->proxySourceFactory =
+            new ProxySourceFactory($this->getGeometryCollectionFactory()));
     }
 
     protected abstract function createEngine(): GeometryEngine;

@@ -117,26 +117,32 @@ services:
   Brick\Geo\IO\GeoJSONReader: ~
   Brick\Geo\Engine\GeometryEngine:
     class: 'Brick\Geo\Engine\GEOSEngine'
-  HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory: ~
-  HeyMoon\VectorTileDataProvider\Factory\SourceFactory: ~
+  HeyMoon\VectorTileDataProvider\Contract\GeometryCollectionFactoryInterface:
+    class: 'HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory'
+  HeyMoon\VectorTileDataProvider\Contract\SourceFactoryInterface:
+    class: 'HeyMoon\VectorTileDataProvider\Factory\SourceFactory'
   HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry:
     class: 'HeyMoon\VectorTileDataProvider\Registry\BasicProjectionRegistry'
   HeyMoon\VectorTileDataProvider\Registry\AbstractExportFormatRegistry:
     class: 'HeyMoon\VectorTileDataProvider\Registry\ExportFormatRegistry'
-  HeyMoon\VectorTileDataProvider\Service\SpatialService: ~
-  HeyMoon\VectorTileDataProvider\Service\GridService: ~
-  HeyMoon\VectorTileDataProvider\Service\TileService: ~
-  HeyMoon\VectorTileDataProvider\Service\ExportService: ~
+  HeyMoon\VectorTileDataProvider\Contract\SpatialServiceInterface:
+    class: 'HeyMoon\VectorTileDataProvider\Service\SpatialService'
+  HeyMoon\VectorTileDataProvider\Contract\GridServiceInterface:
+    class: 'HeyMoon\VectorTileDataProvider\Service\GridService'
+  HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface:
+    class: 'HeyMoon\VectorTileDataProvider\Service\TileService'
+  HeyMoon\VectorTileDataProvider\Contract\ExportServiceInterface:
+    class: 'HeyMoon\VectorTileDataProvider\Service\ExportService'
 ```
 ### Action:
 ```php
 use Brick\Geo\IO\GeoJSONReader;
 use Brick\Geo\Exception\GeometryException;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
-use HeyMoon\VectorTileDataProvider\Factory\SourceFactory;
-use HeyMoon\VectorTileDataProvider\Service\GridService;
-use HeyMoon\VectorTileDataProvider\Service\TileService;
-use HeyMoon\VectorTileDataProvider\Service\ExportService;
+use HeyMoon\VectorTileDataProvider\Contract\SourceFactoryInterface;
+use HeyMoon\VectorTileDataProvider\Contract\GridServiceInterface;
+use HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface;
+use HeyMoon\VectorTileDataProvider\Contract\ExportServiceInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -149,10 +155,10 @@ class ExportCommand extends Command
 {
     public function __construct(
         private readonly GeoJSONReader $geoJSONReader,
-        private readonly SourceFactory $sourceFactory,
-        private readonly GridService $gridService,
-        private readonly TileService $tileService,
-        private readonly ExportService $exportService
+        private readonly SourceFactoryInterface $sourceFactory,
+        private readonly GridServiceInterface $gridService,
+        private readonly TileServiceInterface $tileService,
+        private readonly ExportServiceInterface $exportService
     )
     {
         parent::__construct();

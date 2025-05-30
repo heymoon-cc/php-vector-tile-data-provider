@@ -5,6 +5,7 @@ namespace HeyMoon\VectorTileDataProvider\Tests;
 use Brick\Geo\IO\GeoJSONReader;
 use Brick\Geo\Point;
 use HeyMoon\VectorTileDataProvider\Factory\GEOSServiceFactory;
+use HeyMoon\VectorTileDataProvider\Factory\ProxySourceFactory;
 use HeyMoon\VectorTileDataProvider\Factory\SourceFactory;
 use HeyMoon\VectorTileDataProvider\Factory\TileFactory;
 use HeyMoon\VectorTileDataProvider\Helper\EncodingHelper;
@@ -30,6 +31,7 @@ abstract class BaseTestCase extends TestCase
     private ?TileFactory $tileFactory = null;
     private ?GridService $gridService = null;
     private ?SourceFactory $sourceFactory = null;
+    private ?ProxySourceFactory $proxySourceFactory = null;
 
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
@@ -54,6 +56,12 @@ abstract class BaseTestCase extends TestCase
     {
         return $this->sourceFactory ?? ($this->sourceFactory =
             $this->serviceFactory->getSourceFactory());
+    }
+
+    protected function getProxySourceFactory(): ProxySourceFactory
+    {
+        return $this->proxySourceFactory ?? ($this->proxySourceFactory =
+            $this->serviceFactory->getProxySourceFactory());
     }
 
     protected function getTileService(...$args): TileService

@@ -14,12 +14,13 @@ use HeyMoon\VectorTileDataProvider\Entity\AbstractSource;
 use HeyMoon\VectorTileDataProvider\Entity\Grid;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use HeyMoon\VectorTileDataProvider\Helper\GeometryHelper;
+use HeyMoon\VectorTileDataProvider\Contract\GridServiceInterface;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
 
 /**
  * Filter source features by minZoom and group them by common tiles on given zoom
  */
-class GridService
+class GridService implements GridServiceInterface
 {
     public function __construct(
         private readonly SpatialService $spatialService,

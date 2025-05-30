@@ -32,7 +32,8 @@ class ProxySourceTest extends AbstractSourceTest
      * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractSource::__construct
      * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::createLayer
      * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getEngine
-     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getSourceFactory
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getProxySourceFactory
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\ProxySourceFactory::create
      * @covers \HeyMoon\VectorTileDataProvider\Factory\GEOSServiceFactory::createEngine
      * @covers \HeyMoon\VectorTileDataProvider\Factory\SourceFactory::__construct
      * @covers \HeyMoon\VectorTileDataProvider\Factory\SourceFactory::createProxy
@@ -51,7 +52,7 @@ class ProxySourceTest extends AbstractSourceTest
 
     public function createSource(): AbstractSource
     {
-        return $this->getSourceFactory()->createProxy();
+        return $this->getProxySourceFactory()->create();
     }
 
     public function assertGeometryClass(): string

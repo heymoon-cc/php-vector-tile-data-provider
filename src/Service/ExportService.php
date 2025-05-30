@@ -2,10 +2,11 @@
 
 namespace HeyMoon\VectorTileDataProvider\Service;
 
+use HeyMoon\VectorTileDataProvider\Contract\ExportServiceInterface;
 use HeyMoon\VectorTileDataProvider\Registry\AbstractExportFormatRegistry;
 use Vector_tile\Tile;
 
-class ExportService
+class ExportService implements ExportServiceInterface
 {
     public function __construct(
         private readonly AbstractExportFormatRegistry $factory,

@@ -6,11 +6,11 @@ use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\IO\GeoJSON\FeatureCollection;
-use Countable;
+use HeyMoon\VectorTileDataProvider\Contract\SourceInterface;
 use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
 use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 
-abstract class AbstractSource implements Countable
+abstract class AbstractSource implements SourceInterface
 {
     /** @var AbstractLayer[] */
     private array $layers = [];

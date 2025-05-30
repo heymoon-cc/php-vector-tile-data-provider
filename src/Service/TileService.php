@@ -18,6 +18,7 @@ use Brick\Geo\Point;
 use Brick\Geo\Polygon;
 use ErrorException;
 use Exception;
+use HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface;
 use HeyMoon\VectorTileDataProvider\Entity\AbstractLayer;
 use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
 use HeyMoon\VectorTileDataProvider\Factory\SourceFactory;
@@ -29,10 +30,8 @@ use Vector_tile\Tile;
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)
  */
-class TileService
+class TileService implements TileServiceInterface
 {
-    public const DEFAULT_EXTENT = 4096;
-
     /**
      * List of possible commands
      * https://github.com/mapbox/vector-tile-spec/tree/master/2.1#433-command-types
