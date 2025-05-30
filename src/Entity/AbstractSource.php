@@ -6,8 +6,8 @@ use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\IO\GeoJSON\FeatureCollection;
+use HeyMoon\VectorTileDataProvider\Contract\GeometryCollectionFactoryInterface;
 use HeyMoon\VectorTileDataProvider\Contract\SourceInterface;
-use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
 use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 
 abstract class AbstractSource implements SourceInterface
@@ -15,7 +15,7 @@ abstract class AbstractSource implements SourceInterface
     /** @var AbstractLayer[] */
     private array $layers = [];
 
-    public function __construct(protected readonly GeometryCollectionFactory $geometryCollectionFactory) {}
+    public function __construct(protected readonly GeometryCollectionFactoryInterface $geometryCollectionFactory) {}
 
     /**
      * @throws CoordinateSystemException

@@ -10,7 +10,8 @@ use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\GeometryCollection;
 use Brick\Geo\Point;
-use HeyMoon\VectorTileDataProvider\Entity\AbstractSource;
+use HeyMoon\VectorTileDataProvider\Contract\SourceInterface;
+use HeyMoon\VectorTileDataProvider\Contract\SpatialServiceInterface;
 use HeyMoon\VectorTileDataProvider\Entity\Grid;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use HeyMoon\VectorTileDataProvider\Helper\GeometryHelper;
@@ -23,7 +24,7 @@ use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
 class GridService implements GridServiceInterface
 {
     public function __construct(
-        private readonly SpatialService $spatialService,
+        private readonly SpatialServiceInterface $spatialService,
         private readonly ?GeometryEngine $geometryEngine = null
     ) {}
 
@@ -36,7 +37,7 @@ class GridService implements GridServiceInterface
      * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getGrid(AbstractSource $source, int $zoom, ?callable $filter = null, ?float $buffer = null): Grid
+    public function getGrid(SourceInterface $source, int $zoom, ?callable $filter = null, ?float $buffer = null): Grid
     {
         $grid = [];
         $tileWidth = GeometryHelper::getTileWidth($zoom);

@@ -18,10 +18,10 @@ use Brick\Geo\Point;
 use Brick\Geo\Polygon;
 use ErrorException;
 use Exception;
+use HeyMoon\VectorTileDataProvider\Contract\GeometryCollectionFactoryInterface;
+use HeyMoon\VectorTileDataProvider\Contract\SourceFactoryInterface;
 use HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface;
 use HeyMoon\VectorTileDataProvider\Entity\AbstractLayer;
-use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
-use HeyMoon\VectorTileDataProvider\Factory\SourceFactory;
 use HeyMoon\VectorTileDataProvider\Entity\Feature;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
@@ -45,8 +45,8 @@ class TileService implements TileServiceInterface
      */
     public function __construct(
         private readonly GeometryEngine $geometryEngine,
-        private readonly SourceFactory $sourceFactory,
-        private readonly GeometryCollectionFactory $geometryCollectionFactory,
+        private readonly SourceFactoryInterface $sourceFactory,
+        private readonly GeometryCollectionFactoryInterface $geometryCollectionFactory,
         private readonly float  $minTolerance = 0,
         private readonly bool $flip = true,
     ) {}
