@@ -121,9 +121,9 @@ services:
     class: 'HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory'
   HeyMoon\VectorTileDataProvider\Contract\SourceFactoryInterface:
     class: 'HeyMoon\VectorTileDataProvider\Factory\SourceFactory'
-  HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry:
+  HeyMoon\VectorTileDataProvider\Contract\ProjectionRegistryInterface:
     class: 'HeyMoon\VectorTileDataProvider\Registry\BasicProjectionRegistry'
-  HeyMoon\VectorTileDataProvider\Registry\AbstractExportFormatRegistry:
+  HeyMoon\VectorTileDataProvider\Contract\ExportFormatInterface:
     class: 'HeyMoon\VectorTileDataProvider\Registry\ExportFormatRegistry'
   HeyMoon\VectorTileDataProvider\Contract\SpatialServiceInterface:
     class: 'HeyMoon\VectorTileDataProvider\Service\SpatialService'
