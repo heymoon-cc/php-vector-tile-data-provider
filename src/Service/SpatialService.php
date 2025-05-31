@@ -13,19 +13,20 @@ use Brick\Geo\MultiPoint;
 use Brick\Geo\MultiPolygon;
 use Brick\Geo\Point;
 use Brick\Geo\Polygon;
+use HeyMoon\VectorTileDataProvider\Contract\ProjectionRegistryInterface;
 use HeyMoon\VectorTileDataProvider\Entity\AbstractSourceComponent;
 use HeyMoon\VectorTileDataProvider\Entity\Feature;
 use HeyMoon\VectorTileDataProvider\Exception\SpatialSystemDecodeException;
 use HeyMoon\VectorTileDataProvider\Exception\SpatialSystemEncodeException;
-use HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry;
+use HeyMoon\VectorTileDataProvider\Contract\SpatialServiceInterface;
 use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)
  */
-class SpatialService extends AbstractSourceComponent
+class SpatialService extends AbstractSourceComponent implements SpatialServiceInterface
 {
-    public function __construct(private readonly AbstractProjectionRegistry $projectionRegistry) {}
+    public function __construct(private readonly ProjectionRegistryInterface $projectionRegistry) {}
 
     /**
      * @param Feature[] $features

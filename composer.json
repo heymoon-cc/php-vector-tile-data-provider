@@ -1,6 +1,6 @@
 {
     "name": "heymoon/vector-tile-data-provider",
-    "version": "1.0.9",
+    "version": "1.1.0",
     "description": "Serve, write and read Mapbox Vector Tile 2.1",
     "type": "library",
     "license": "MIT",
@@ -45,6 +45,9 @@
         ],
         "test": [
             "phpunit --log-junit=test-reports/tests.xml --coverage-cobertura=test-reports/coverage.xml --no-interaction"
+        ],
+        "coverage": [
+            "phpunit --coverage-cobertura=test-reports/coverage.xml --no-interaction"
         ],
         "phpmd": [
             "phpmd src github ruleset.xml"

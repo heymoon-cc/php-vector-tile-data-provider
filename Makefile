@@ -1,9 +1,6 @@
 protoc:
 	protoc --proto_path=./proto --php_out=./proto/gen ./proto/vector_tile.proto
 
-test:
-	./vendor/bin/phpunit
-
 cache:
 	docker pull heymoon/php-vector-tile-data-provider-tester-builder || true
 	docker pull heymoon/php-vector-tile-data-provider-tester || true
@@ -22,8 +19,11 @@ push: image
 composer: clean.container
 	docker run --name php-vector-tile-data-provider-tester -v $$(pwd):/code heymoon/php-vector-tile-data-provider-tester install
 
-audit: clean.container
+test: clean.container
 	docker run --name php-vector-tile-data-provider-tester -v $$(pwd):/code heymoon/php-vector-tile-data-provider-tester test
+
+coverage: clean.container
+	docker run --name php-vector-tile-data-provider-tester -v $$(pwd):/code heymoon/php-vector-tile-data-provider-tester coverage
 
 phpmd: clean.container
 	docker run --name php-vector-tile-data-provider-tester -v $$(pwd):/code heymoon/php-vector-tile-data-provider-tester phpmd

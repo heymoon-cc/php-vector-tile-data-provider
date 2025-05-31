@@ -8,7 +8,10 @@ use Brick\Geo\Exception\GeometryEngineException;
 use Brick\Geo\Exception\GeometryException;
 use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
+use Brick\Geo\IO\GeoJSON\FeatureCollection;
 use Brick\Geo\Point;
+use Brick\Geo\Polygon;
+use ErrorException;
 use Exception;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
 use HeyMoon\VectorTileDataProvider\Tests\BaseTestCase;
@@ -136,6 +139,75 @@ class TileTest extends BaseTestCase
         $this->assertCount(1, $merged->getLayers());
         $this->assertFeaturesCount(88, $tile);
         $this->assertFeaturesCount(44, $merged);
+    }
+
+    /**
+     * @throws CoordinateSystemException
+     * @throws InvalidGeometryException
+     * @throws ErrorException
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::flipRow
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::getColumn
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::getGridSize
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::getKey
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::getMaxPoint
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::getMinPoint
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::getRow
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::getTileWidth
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::getZoom
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::xyz
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::xyzFlip
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getEngine
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getGeometryCollectionFactory
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getSourceFactory
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getSpatialService
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\AbstractServiceFactory::getTileService
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\GEOSServiceFactory::createEngine
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\TileFactory::parse
+     * @covers \HeyMoon\VectorTileDataProvider\Helper\EncodingHelper::getOriginalOrGZIP
+     * @covers \HeyMoon\VectorTileDataProvider\Helper\GeometryHelper::getGridSize
+     * @covers \HeyMoon\VectorTileDataProvider\Helper\GeometryHelper::getTileWidth
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry::addProjection
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\AbstractProjectionRegistry::get
+     * @covers \HeyMoon\VectorTileDataProvider\Registry\BasicProjectionRegistry::supports
+     * @covers \HeyMoon\VectorTileDataProvider\Service\SpatialService::transformPoint
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::decodeCommand
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::decodeValue
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getValue
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getValues
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::get
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::getSRID
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::isAligned
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::toWGS84
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::latitudeToWGS84
+     * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::longitudeToWGS84
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::decodeGeometry
+     */
+    public function testGeometryDecode()
+    {
+        $factory = $this->getTileFactory();
+        $tile = $factory->parse($this->getFixture('tile.mvt'));
+        $this->assertGreaterThanOrEqual(1, $tile->getLayers()->count());
+        foreach ($tile->getLayers() as $layer) {
+            $collection = $this->getTileService()->decodeGeometry($layer, TilePosition::xyzFlip(619, 320, 10));
+            $this->assertInstanceOf(FeatureCollection::class, $collection);
+            $this->assertCount(44, $collection->getFeatures());
+            foreach ($collection->getFeatures() as $feature) {
+                foreach (['id', 'NAME'] as $property) {
+                    $this->assertObjectHasProperty($property, $feature->getProperties());
+                }
+                $geometry = $feature->getGeometry();
+                $this->assertInstanceOf(Polygon::class, $geometry);
+                foreach ($geometry->rings() as $ring) {
+                    foreach ($ring->points() as $point) {
+                        $this->assertEquals(37.0, floor($point->x()));
+                        $this->assertEquals(55.0, floor($point->y()));
+                    }
+                }
+            }
+        }
     }
 
     /**

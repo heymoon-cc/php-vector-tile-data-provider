@@ -12,27 +12,30 @@ use Brick\Geo\Exception\NoSuchGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\GeometryCollection;
+use Brick\Geo\IO\GeoJSON\FeatureCollection;
+use Brick\Geo\IO\GeoJSON\Feature as FeatureCollectionItem;
 use Brick\Geo\LineString;
 use Brick\Geo\MultiPoint;
 use Brick\Geo\Point;
 use Brick\Geo\Polygon;
 use ErrorException;
 use Exception;
+use HeyMoon\VectorTileDataProvider\Contract\GeometryCollectionFactoryInterface;
+use HeyMoon\VectorTileDataProvider\Contract\SourceFactoryInterface;
+use HeyMoon\VectorTileDataProvider\Contract\SpatialServiceInterface;
+use HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface;
 use HeyMoon\VectorTileDataProvider\Entity\AbstractLayer;
-use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
-use HeyMoon\VectorTileDataProvider\Factory\SourceFactory;
 use HeyMoon\VectorTileDataProvider\Entity\Feature;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
+use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 use Vector_tile\Tile;
 
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)
  */
-class TileService
+class TileService implements TileServiceInterface
 {
-    public const DEFAULT_EXTENT = 4096;
-
     /**
      * List of possible commands
      * https://github.com/mapbox/vector-tile-spec/tree/master/2.1#433-command-types
@@ -46,8 +49,9 @@ class TileService
      */
     public function __construct(
         private readonly GeometryEngine $geometryEngine,
-        private readonly SourceFactory $sourceFactory,
-        private readonly GeometryCollectionFactory $geometryCollectionFactory,
+        private readonly SourceFactoryInterface $sourceFactory,
+        private readonly GeometryCollectionFactoryInterface $geometryCollectionFactory,
+        private readonly SpatialServiceInterface $spatialService,
         private readonly float  $minTolerance = 0,
         private readonly bool $flip = true,
     ) {}
@@ -271,9 +275,97 @@ class TileService
             $value = $feature->getTags()[$pos + 1];
             /** @var Tile\Value $object */
             $object = $layer->getValues()[$value];
-            $result[$layer->getKeys()[$key]] = $object->getStringValue() ?: $object->getUintValue();
+            $result[$layer->getKeys()[$key]] = $this->getValue($object);
         }
         return $result;
+    }
+
+    /**
+     * @param Tile\Layer $layer
+     * @param TilePosition $position
+     * @return FeatureCollection
+     * @throws CoordinateSystemException
+     * @throws InvalidGeometryException
+     * @throws ErrorException
+     * @noinspection PhpMissingBreakStatementInspection
+     */
+    public function decodeGeometry(Tile\Layer $layer, TilePosition $position): FeatureCollection
+    {
+        $collection = [];
+        /** @var Tile\Feature $feature */
+        foreach ($layer->getFeatures() as $feature) {
+            /** @var Point[] $path */
+            $path = [];
+            $paths = [];
+            $command = null;
+            $currentCount = 0;
+            $expectedCount = null;
+            $cursor = Point::xy(0, 0);
+            for ($i = 0; $i <= $feature->getGeometry()->count(); $i++) {
+                if (!$feature->getGeometry()->offsetExists($i)) {
+                    if ($path) {
+                        $paths[] = $path;
+                    }
+                    break;
+                }
+                $item = $feature->getGeometry()->offsetGet($i);
+                if (!$command) {
+                    list($command, $expectedCount) = $this->decodeCommand(
+                        $item
+                    );
+                    $currentCount = 0;
+                    if ($command === self::CLOSE_PATH) {
+                        $end = end($path);
+                        $start = reset($path);
+                        if ($end->x() !== $start->x() || $end->y() !== $start->y()) {
+                            $path[] = $start;
+                        }
+                    }
+                    continue;
+                }
+                $i++;
+                if (!$feature->getGeometry()->offsetExists($i)) {
+                    if ($path) {
+                        $paths[] = $path;
+                    }
+                    break;
+                }
+                $x = $this->decodeValue($item) / $layer->getExtent() * $position->getTileWidth();
+                $y = $this->decodeValue($feature->getGeometry()->offsetGet($i)) /
+                    $layer->getExtent() * $position->getTileWidth();
+                switch ($command) {
+                    case self::CLOSE_PATH:
+                    case self::MOVE_TO:
+                        if ($path) {
+                            $paths[] = $path;
+                            $path = [];
+                        }
+                        if ($command === self::CLOSE_PATH) {
+                            break;
+                        }
+                    case self::LINE_TO:
+                        $cursor = Point::xy($cursor->x() + $x, $cursor->y() + $y);
+                        $path[] = $this->spatialService->transformPoint(
+                            Point::xy($position->getMinPoint()->x() + $cursor->x(),
+                            $position->getMaxPoint()->y() - $cursor->y(),
+                                WebMercatorProjection::SRID),WorldGeodeticProjection::SRID);
+                }
+                $currentCount++;
+                if ($currentCount >= $expectedCount) {
+                    $command = null;
+                }
+            }
+            $geometry = array_map(fn(array $path) => match ($feature->getType()) {
+                Tile\GeomType::POINT => reset($path),
+                Tile\GeomType::LINESTRING => LineString::of(...$path)->withSRID(WorldGeodeticProjection::SRID),
+                Tile\GeomType::POLYGON => Polygon::of(LineString::of(...$path)
+                    ->withSRID(WorldGeodeticProjection::SRID))->withSRID(WorldGeodeticProjection::SRID)
+            }, $paths);
+            $collection[] = new FeatureCollectionItem(count($geometry) > 1 ?
+                $this->geometryCollectionFactory->get($geometry) : reset($geometry),
+                (object)array_merge($this->getValues($layer, $feature), ['id' => $feature->getId()]));
+        }
+        return new FeatureCollection(...$collection);
     }
 
     /**
@@ -363,9 +455,19 @@ class TileService
             }
             $simplified = [];
             foreach ($shapesByTypes as $type => $items) {
-                $simplified[$type] = $this->geometryEngine->simplify(
-                    count($items) > 1 ? $this->geometryCollectionFactory->get($items) : array_shift($items), $tolerance
-                );
+                try {
+                    $simplified[$type] = $this->geometryEngine->simplify(
+                        count($items) > 1 ? $this->geometryCollectionFactory->get($items) : array_shift($items), $tolerance
+                    );
+                } catch (GeometryEngineException $e) {
+                    if ($e->getPrevious() === null) {
+                        throw $e;
+                    }
+                    $simplified[$type] = $this->geometryEngine->simplify($this->geometryEngine->buffer(
+                        count($items) > 1 ? $this->geometryCollectionFactory->get($items) :
+                            array_shift($items), $tolerance
+                    ), $tolerance);
+                }
             }
             foreach ($simplified as $type => $collection) {
                 foreach ($collection instanceof GeometryCollection ? $collection->geometries() : [$collection]
@@ -390,12 +492,17 @@ class TileService
         return $features;
     }
 
-    protected function getValue(Tile\Value $value): string|int|null|float
+    protected function getValue(Tile\Value $object): bool|int|float|string|null
     {
-        return $value->hasStringValue() ? $value->getStringValue() :
-            ($value->hasUintValue() ? $value->getUintValue() : ($value->hasSintValue() ? $value->getSintValue() :
-                ($value->hasIntValue() ? $value->getIntValue() : ($value->hasFloatValue() ? $value->getFloatValue() :
-                        ($value->hasDoubleValue() ? $value->getDoubleValue() : null)))));
+        foreach (['Bool', 'Int', 'Uint', 'Sint', 'Float', 'Double', 'String'] as $type) {
+            $hasValueMethod = "has{$type}Value";
+            if (!$object->$hasValueMethod()) {
+                continue;
+            }
+            $getValueMethod = "get{$type}Value";
+            return $object->$getValueMethod();
+        }
+        return null;
     }
 
     /**
@@ -406,14 +513,14 @@ class TileService
         /** @var Tile\Value[] $values */
         $new = array_keys($parameters);
         foreach ($new as $key) {
-            if (!in_array($key, $keys, true) && !is_null($parameters[$key])) {
+            if (!in_array($key, $keys, true) && $parameters[$key] !== null) {
                 $keys[] = $key;
             }
         }
         $tags = [];
         foreach ($keys as $id => $key) {
             $value = $parameters[$key] ?? null;
-            if (is_null($value)) {
+            if ($value === null) {
                 continue;
             }
             foreach ($values as $tag => $existing) {

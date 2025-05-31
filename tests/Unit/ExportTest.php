@@ -30,6 +30,7 @@ class ExportTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::decodeCommand
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::decodeValue
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getExtent
+     * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getValue
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::getValues
      * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::__construct
      * @covers \HeyMoon\VectorTileDataProvider\Spatial\AbstractProjection::get

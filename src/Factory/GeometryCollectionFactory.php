@@ -6,9 +6,10 @@ use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\GeometryCollection;
+use HeyMoon\VectorTileDataProvider\Contract\GeometryCollectionFactoryInterface;
 use ReflectionClass;
 
-class GeometryCollectionFactory
+class GeometryCollectionFactory implements GeometryCollectionFactoryInterface
 {
     private array $collectionClass = [];
 

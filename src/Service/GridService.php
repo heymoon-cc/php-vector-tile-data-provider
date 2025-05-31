@@ -10,19 +10,21 @@ use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\GeometryCollection;
 use Brick\Geo\Point;
-use HeyMoon\VectorTileDataProvider\Entity\AbstractSource;
+use HeyMoon\VectorTileDataProvider\Contract\SourceInterface;
+use HeyMoon\VectorTileDataProvider\Contract\SpatialServiceInterface;
 use HeyMoon\VectorTileDataProvider\Entity\Grid;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use HeyMoon\VectorTileDataProvider\Helper\GeometryHelper;
+use HeyMoon\VectorTileDataProvider\Contract\GridServiceInterface;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
 
 /**
  * Filter source features by minZoom and group them by common tiles on given zoom
  */
-class GridService
+class GridService implements GridServiceInterface
 {
     public function __construct(
-        private readonly SpatialService $spatialService,
+        private readonly SpatialServiceInterface $spatialService,
         private readonly ?GeometryEngine $geometryEngine = null
     ) {}
 
@@ -35,7 +37,7 @@ class GridService
      * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getGrid(AbstractSource $source, int $zoom, ?callable $filter = null, ?float $buffer = null): Grid
+    public function getGrid(SourceInterface $source, int $zoom, ?callable $filter = null, ?float $buffer = null): Grid
     {
         $grid = [];
         $tileWidth = GeometryHelper::getTileWidth($zoom);
@@ -75,19 +77,13 @@ class GridService
         return new Grid($zoom, $grid);
     }
 
-    protected function getColumn(?Point $point, float $tileWidth): ?int
+    protected function getColumn(Point $point, float $tileWidth): ?int
     {
-        if (is_null($point)) {
-            return null;
-        }
         return (int)floor(($point->x() + WebMercatorProjection::EARTH_RADIUS) / $tileWidth);
     }
 
-    protected function getRow(?Point $point, float $tileWidth): ?int
+    protected function getRow(Point $point, float $tileWidth): ?int
     {
-        if (is_null($point)) {
-            return null;
-        }
         return (int)floor(($point->y() + WebMercatorProjection::EARTH_RADIUS) / $tileWidth);
     }
 }
