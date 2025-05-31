@@ -489,7 +489,7 @@ class TileService implements TileServiceInterface
         return $features;
     }
 
-    private function getValue(Tile\Value $object): bool|int|float|string|null
+    protected function getValue(Tile\Value $object): bool|int|float|string|null
     {
         foreach (['Bool', 'Int', 'Uint', 'Sint', 'Float', 'Double', 'String'] as $type) {
             $hasValueMethod = "has{$type}Value";
