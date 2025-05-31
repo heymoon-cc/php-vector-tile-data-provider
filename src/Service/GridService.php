@@ -77,19 +77,13 @@ class GridService implements GridServiceInterface
         return new Grid($zoom, $grid);
     }
 
-    protected function getColumn(?Point $point, float $tileWidth): ?int
+    protected function getColumn(Point $point, float $tileWidth): ?int
     {
-        if (is_null($point)) {
-            return null;
-        }
         return (int)floor(($point->x() + WebMercatorProjection::EARTH_RADIUS) / $tileWidth);
     }
 
-    protected function getRow(?Point $point, float $tileWidth): ?int
+    protected function getRow(Point $point, float $tileWidth): ?int
     {
-        if (is_null($point)) {
-            return null;
-        }
         return (int)floor(($point->y() + WebMercatorProjection::EARTH_RADIUS) / $tileWidth);
     }
 }

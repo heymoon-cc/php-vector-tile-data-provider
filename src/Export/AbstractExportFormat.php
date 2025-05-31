@@ -19,7 +19,7 @@ abstract class AbstractExportFormat implements ExportFormatInterface
     public function isAvailable(): bool
     {
         $class = $this->getDependencyClass();
-        return is_null($class) || class_exists($class);
+        return $class === null || class_exists($class);
     }
 
     public function require(): array

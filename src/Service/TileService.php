@@ -459,7 +459,10 @@ class TileService implements TileServiceInterface
                     $simplified[$type] = $this->geometryEngine->simplify(
                         count($items) > 1 ? $this->geometryCollectionFactory->get($items) : array_shift($items), $tolerance
                     );
-                } catch (GeometryEngineException) {
+                } catch (GeometryEngineException $e) {
+                    if ($e->getPrevious() === null) {
+                        throw $e;
+                    }
                     $simplified[$type] = $this->geometryEngine->simplify($this->geometryEngine->buffer(
                         count($items) > 1 ? $this->geometryCollectionFactory->get($items) :
                             array_shift($items), $tolerance
@@ -510,14 +513,14 @@ class TileService implements TileServiceInterface
         /** @var Tile\Value[] $values */
         $new = array_keys($parameters);
         foreach ($new as $key) {
-            if (!in_array($key, $keys, true) && !is_null($parameters[$key])) {
+            if (!in_array($key, $keys, true) && $parameters[$key] !== null) {
                 $keys[] = $key;
             }
         }
         $tags = [];
         foreach ($keys as $id => $key) {
             $value = $parameters[$key] ?? null;
-            if (is_null($value)) {
+            if ($value === null) {
                 continue;
             }
             foreach ($values as $tag => $existing) {
