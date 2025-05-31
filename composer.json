@@ -46,6 +46,9 @@
         "test": [
             "phpunit --log-junit=test-reports/tests.xml --coverage-cobertura=test-reports/coverage.xml --no-interaction"
         ],
+        "coverage": [
+            "phpunit --coverage-cobertura=test-reports/coverage.xml --no-interaction"
+        ],
         "phpmd": [
             "phpmd src github ruleset.xml"
         ]

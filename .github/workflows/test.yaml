@@ -18,17 +18,18 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: make composer
-      - run: make audit
+      - run: make test
       - name: Upload test results
         uses: mikepenz/action-junit-report@v3
         with:
           report_paths: test-reports/tests.xml
       - name: Upload coverage results
-        uses: paambaati/codeclimate-action@v3.2.0
+        uses: paambaati/codeclimate-action@v8.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CodeClimateToken }}
         with:
-          coverageLocations: ${{ github.workspace }}/test-reports/coverage.xml:cobertura
+          coverageLocations: |
+            ${{ github.workspace }}/test-reports/coverage.xml:cobertura
           workingDirectory: ${{ github.workspace }}/src
       - name: PHPMD
         run: make phpmd
