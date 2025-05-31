@@ -2,6 +2,7 @@
 
 namespace HeyMoon\VectorTileDataProvider\Contract;
 
+use Brick\Geo\IO\GeoJSON\FeatureCollection;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use Vector_tile\Tile;
 
@@ -18,4 +19,5 @@ interface TileServiceInterface
     public function mergeLayers(Tile $tile): Tile;
     public function createLayer(string $name, int $extent = self::DEFAULT_EXTENT): Tile\Layer;
     public function getValues(Tile\Layer $layer, Tile\Feature $feature): array;
+    public function decodeGeometry(Tile\Layer $layer, TilePosition $position): FeatureCollection;
 }

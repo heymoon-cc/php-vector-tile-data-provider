@@ -12,6 +12,8 @@ use Brick\Geo\Exception\NoSuchGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\GeometryCollection;
+use Brick\Geo\IO\GeoJSON\FeatureCollection;
+use Brick\Geo\IO\GeoJSON\Feature as FeatureCollectionItem;
 use Brick\Geo\LineString;
 use Brick\Geo\MultiPoint;
 use Brick\Geo\Point;
@@ -20,11 +22,13 @@ use ErrorException;
 use Exception;
 use HeyMoon\VectorTileDataProvider\Contract\GeometryCollectionFactoryInterface;
 use HeyMoon\VectorTileDataProvider\Contract\SourceFactoryInterface;
+use HeyMoon\VectorTileDataProvider\Contract\SpatialServiceInterface;
 use HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface;
 use HeyMoon\VectorTileDataProvider\Entity\AbstractLayer;
 use HeyMoon\VectorTileDataProvider\Entity\Feature;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
+use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 use Vector_tile\Tile;
 
 /**
@@ -47,6 +51,7 @@ class TileService implements TileServiceInterface
         private readonly GeometryEngine $geometryEngine,
         private readonly SourceFactoryInterface $sourceFactory,
         private readonly GeometryCollectionFactoryInterface $geometryCollectionFactory,
+        private readonly SpatialServiceInterface $spatialService,
         private readonly float  $minTolerance = 0,
         private readonly bool $flip = true,
     ) {}
@@ -273,6 +278,94 @@ class TileService implements TileServiceInterface
             $result[$layer->getKeys()[$key]] = $this->getValue($object);
         }
         return $result;
+    }
+
+    /**
+     * @param Tile\Layer $layer
+     * @param TilePosition $position
+     * @return FeatureCollection
+     * @throws CoordinateSystemException
+     * @throws InvalidGeometryException
+     * @throws ErrorException
+     * @noinspection PhpMissingBreakStatementInspection
+     */
+    public function decodeGeometry(Tile\Layer $layer, TilePosition $position): FeatureCollection
+    {
+        $collection = [];
+        /** @var Tile\Feature $feature */
+        foreach ($layer->getFeatures() as $feature) {
+            /** @var Point[] $path */
+            $path = [];
+            $paths = [];
+            $command = null;
+            $currentCount = 0;
+            $expectedCount = null;
+            $cursor = Point::xy(0, 0);
+            for ($i = 0; $i <= $feature->getGeometry()->count(); $i++) {
+                if (!$feature->getGeometry()->offsetExists($i)) {
+                    if ($path) {
+                        $paths[] = $path;
+                    }
+                    break;
+                }
+                $item = $feature->getGeometry()->offsetGet($i);
+                if (!$command) {
+                    list($command, $expectedCount) = $this->decodeCommand(
+                        $item
+                    );
+                    $currentCount = 0;
+                    if ($command === self::CLOSE_PATH) {
+                        $end = end($path);
+                        $start = reset($path);
+                        if ($end->x() !== $start->x() || $end->y() !== $start->y()) {
+                            $path[] = $start;
+                        }
+                    }
+                    continue;
+                }
+                $i++;
+                if (!$feature->getGeometry()->offsetExists($i)) {
+                    if ($path) {
+                        $paths[] = $path;
+                    }
+                    break;
+                }
+                $x = $this->decodeValue($item) / $layer->getExtent() * $position->getTileWidth();
+                $y = $this->decodeValue($feature->getGeometry()->offsetGet($i)) /
+                    $layer->getExtent() * $position->getTileWidth();
+                switch ($command) {
+                    case self::CLOSE_PATH:
+                    case self::MOVE_TO:
+                        if ($path) {
+                            $paths[] = $path;
+                            $path = [];
+                        }
+                        if ($command === self::CLOSE_PATH) {
+                            break;
+                        }
+                    case self::LINE_TO:
+                        $cursor = Point::xy($cursor->x() + $x, $cursor->y() + $y);
+                        $path[] = $this->spatialService->transformPoint(
+                            Point::xy($position->getMinPoint()->x() + $cursor->x(),
+                            $position->getMaxPoint()->y() - $cursor->y(),
+                                WebMercatorProjection::SRID),WorldGeodeticProjection::SRID);
+                }
+                $currentCount++;
+                if ($currentCount >= $expectedCount) {
+                    $command = null;
+                }
+            }
+            $geometry = array_map(fn(array $path) => match ($feature->getType()) {
+                Tile\GeomType::POINT => reset($path),
+                Tile\GeomType::LINESTRING => LineString::of(...$path)->withSRID(WorldGeodeticProjection::SRID),
+                Tile\GeomType::POLYGON => Polygon::of(LineString::of(...$path)
+                    ->withSRID(WorldGeodeticProjection::SRID))->withSRID(WorldGeodeticProjection::SRID)
+            }, $paths);
+            $collection[] = new FeatureCollectionItem(count($geometry) > 1 ?
+                $this->geometryCollectionFactory->get($geometry) : reset($geometry),
+                (object)array_merge($this->getValues($layer, $feature), ['id' => $feature->getId()]));
+        }
+        return new FeatureCollection(...$collection);
     }
 
     /**
