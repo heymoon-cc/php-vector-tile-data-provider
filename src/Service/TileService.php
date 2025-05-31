@@ -366,7 +366,7 @@ class TileService implements TileServiceInterface
                     $simplified[$type] = $this->geometryEngine->simplify(
                         count($items) > 1 ? $this->geometryCollectionFactory->get($items) : array_shift($items), $tolerance
                     );
-                } catch (GeometryEngineException $e) {
+                } catch (GeometryEngineException) {
                     $simplified[$type] = $this->geometryEngine->simplify($this->geometryEngine->buffer(
                         count($items) > 1 ? $this->geometryCollectionFactory->get($items) :
                             array_shift($items), $tolerance
