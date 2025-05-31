@@ -17,7 +17,6 @@ interface TileServiceInterface
     ): Tile;
     public function getExtent(Tile $tile): int;
     public function mergeLayers(Tile $tile): Tile;
-    public function createLayer(string $name, int $extent = self::DEFAULT_EXTENT): Tile\Layer;
     public function getValues(Tile\Layer $layer, Tile\Feature $feature): array;
     public function decodeGeometry(Tile\Layer $layer, TilePosition $position): FeatureCollection;
 }

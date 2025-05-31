@@ -2,7 +2,7 @@
 
 namespace HeyMoon\VectorTileDataProvider\Export;
 
-use HeyMoon\VectorTileDataProvider\Service\TileService;
+use HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface;
 use Vector_tile\Tile;
 
 interface ExportFormatInterface
@@ -11,7 +11,7 @@ interface ExportFormatInterface
 
     public function supports(): array;
 
-    public function export(TileService $service, Tile $tile, string|callable|null $color = null): object|string;
+    public function export(TileServiceInterface $service, Tile $tile, string|callable|null $color = null): object|string;
 
     public function isAvailable(): bool;
 

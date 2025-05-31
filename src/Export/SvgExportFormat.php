@@ -3,6 +3,7 @@
 namespace HeyMoon\VectorTileDataProvider\Export;
 
 use ErrorException;
+use HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface;
 use HeyMoon\VectorTileDataProvider\Service\TileService;
 use SVG\Nodes\Shapes\SVGCircle;
 use SVG\Nodes\Shapes\SVGPath;
@@ -15,7 +16,7 @@ class SvgExportFormat extends AbstractExportFormat
     /**
      * @throws ErrorException
      */
-    public function export(TileService $service, Tile $tile, callable|string|null $color = null): object|string
+    public function export(TileServiceInterface $service, Tile $tile, callable|string|null $color = null): object|string
     {
         $extent = $service->getExtent($tile);
         $image = new SVG($extent, $extent);

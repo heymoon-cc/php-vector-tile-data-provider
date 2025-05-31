@@ -2,7 +2,7 @@
 
 namespace HeyMoon\VectorTileDataProvider\Export;
 
-use HeyMoon\VectorTileDataProvider\Service\TileService;
+use HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface;
 use Vector_tile\Tile;
 
 class MvtExportFormat extends AbstractExportFormat
@@ -12,7 +12,7 @@ class MvtExportFormat extends AbstractExportFormat
         return ['mvt', 'pbf'];
     }
 
-    public function export(TileService $service, Tile $tile, callable|string|null $color = null): object|string
+    public function export(TileServiceInterface $service, Tile $tile, callable|string|null $color = null): object|string
     {
         return $tile->serializeToString();
     }
