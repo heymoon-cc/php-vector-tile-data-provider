@@ -270,7 +270,7 @@ class TileService implements TileServiceInterface
             $value = $feature->getTags()[$pos + 1];
             /** @var Tile\Value $object */
             $object = $layer->getValues()[$value];
-            $result[$layer->getKeys()[$key]] = $object->getStringValue() ?: $object->getUintValue();
+            $result[$layer->getKeys()[$key]] = $this->getValue($object);
         }
         return $result;
     }
@@ -396,12 +396,17 @@ class TileService implements TileServiceInterface
         return $features;
     }
 
-    protected function getValue(Tile\Value $value): string|int|null|float
+    private function getValue(Tile\Value $object): bool|int|float|string|null
     {
-        return $value->hasStringValue() ? $value->getStringValue() :
-            ($value->hasUintValue() ? $value->getUintValue() : ($value->hasSintValue() ? $value->getSintValue() :
-                ($value->hasIntValue() ? $value->getIntValue() : ($value->hasFloatValue() ? $value->getFloatValue() :
-                        ($value->hasDoubleValue() ? $value->getDoubleValue() : null)))));
+        foreach (['Bool', 'Int', 'Uint', 'Sint', 'Float', 'Double', 'String'] as $type) {
+            $hasValueMethod = "has{$type}Value";
+            if (!$object->$hasValueMethod()) {
+                continue;
+            }
+            $getValueMethod = "get{$type}Value";
+            return $object->$getValueMethod();
+        }
+        return null;
     }
 
     /**
