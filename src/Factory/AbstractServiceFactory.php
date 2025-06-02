@@ -23,7 +23,6 @@ abstract class AbstractServiceFactory
             $this->getEngine(),
             $this->getSourceFactory(),
             $this->getGeometryCollectionFactory(),
-            $this->getSpatialService(),
             ...$args);
     }
 

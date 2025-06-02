@@ -7,6 +7,7 @@ use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\IO\GeoJSON\Feature as GeoJSONFeature;
 use Brick\Geo\Proxy\ProxyInterface;
+use HeyMoon\VectorTileDataProvider\Contract\LayerInterface;
 use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
 use Stringable;
 
@@ -85,6 +86,10 @@ class Feature extends AbstractSourceComponent implements Stringable
         return array_diff_key($this->parameters, ['id' => $this->id]);
     }
 
+    /**
+     * @throws CoordinateSystemException
+     * @throws UnexpectedGeometryException
+     */
     public function asGeoJSONFeature(): GeoJSONFeature
     {
         return new GeoJSONFeature($this->getGeometry(), $this->getFeatureParameters());
@@ -95,10 +100,7 @@ class Feature extends AbstractSourceComponent implements Stringable
         return $this->parameters[$key] ?? null;
     }
 
-    /**
-     * @return AbstractLayer
-     */
-    public function getLayer(): AbstractLayer
+    public function getLayer(): LayerInterface
     {
         return $this->layer;
     }

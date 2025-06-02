@@ -2,17 +2,16 @@
 
 namespace HeyMoon\VectorTileDataProvider\Entity;
 
-use ArrayAccess;
 use Brick\Geo\Exception\CoordinateSystemException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\GeometryCollection;
 use Brick\Geo\IO\GeoJSON\FeatureCollection;
-use Countable;
+use HeyMoon\VectorTileDataProvider\Contract\LayerInterface;
 use HeyMoon\VectorTileDataProvider\Factory\GeometryCollectionFactory;
 use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 
-abstract class AbstractLayer extends AbstractSourceComponent implements ArrayAccess, Countable
+abstract class AbstractLayer extends AbstractSourceComponent implements LayerInterface
 {
     /** @var Feature[] */
     protected array $features = [];

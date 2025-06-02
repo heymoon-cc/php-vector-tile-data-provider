@@ -12,8 +12,6 @@ use Brick\Geo\Exception\NoSuchGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
 use Brick\Geo\Geometry;
 use Brick\Geo\GeometryCollection;
-use Brick\Geo\IO\GeoJSON\FeatureCollection;
-use Brick\Geo\IO\GeoJSON\Feature as FeatureCollectionItem;
 use Brick\Geo\LineString;
 use Brick\Geo\MultiPoint;
 use Brick\Geo\Point;
@@ -21,14 +19,13 @@ use Brick\Geo\Polygon;
 use ErrorException;
 use Exception;
 use HeyMoon\VectorTileDataProvider\Contract\GeometryCollectionFactoryInterface;
+use HeyMoon\VectorTileDataProvider\Contract\LayerInterface;
 use HeyMoon\VectorTileDataProvider\Contract\SourceFactoryInterface;
-use HeyMoon\VectorTileDataProvider\Contract\SpatialServiceInterface;
 use HeyMoon\VectorTileDataProvider\Contract\TileServiceInterface;
 use HeyMoon\VectorTileDataProvider\Entity\AbstractLayer;
 use HeyMoon\VectorTileDataProvider\Entity\Feature;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
-use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 use Vector_tile\Tile;
 
 /**
@@ -51,7 +48,6 @@ class TileService implements TileServiceInterface
         private readonly GeometryEngine $geometryEngine,
         private readonly SourceFactoryInterface $sourceFactory,
         private readonly GeometryCollectionFactoryInterface $geometryCollectionFactory,
-        private readonly SpatialServiceInterface $spatialService,
         private readonly float  $minTolerance = 0,
         private readonly bool $flip = true,
     ) {}
@@ -283,15 +279,15 @@ class TileService implements TileServiceInterface
     /**
      * @param Tile\Layer $layer
      * @param TilePosition $position
-     * @return FeatureCollection
+     * @return LayerInterface
      * @throws CoordinateSystemException
      * @throws InvalidGeometryException
      * @throws ErrorException
      * @noinspection PhpMissingBreakStatementInspection
      */
-    public function decodeGeometry(Tile\Layer $layer, TilePosition $position): FeatureCollection
+    public function decodeGeometry(Tile\Layer $layer, TilePosition $position): LayerInterface
     {
-        $collection = [];
+        $source = $this->sourceFactory->create();
         /** @var Tile\Feature $feature */
         foreach ($layer->getFeatures() as $feature) {
             /** @var Point[] $path */
@@ -345,10 +341,9 @@ class TileService implements TileServiceInterface
                         }
                     case self::LINE_TO:
                         $cursor = Point::xy($cursor->x() + $x, $cursor->y() + $y);
-                        $path[] = $this->spatialService->transformPoint(
-                            Point::xy($position->getMinPoint()->x() + $cursor->x(),
+                        $path[] = Point::xy($position->getMinPoint()->x() + $cursor->x(),
                             $position->getMaxPoint()->y() - $cursor->y(),
-                                WebMercatorProjection::SRID),WorldGeodeticProjection::SRID);
+                                WebMercatorProjection::SRID);
                 }
                 $currentCount++;
                 if ($currentCount >= $expectedCount) {
@@ -357,15 +352,15 @@ class TileService implements TileServiceInterface
             }
             $geometry = array_map(fn(array $path) => match ($feature->getType()) {
                 Tile\GeomType::POINT => reset($path),
-                Tile\GeomType::LINESTRING => LineString::of(...$path)->withSRID(WorldGeodeticProjection::SRID),
+                Tile\GeomType::LINESTRING => LineString::of(...$path)->withSRID(WebMercatorProjection::SRID),
                 Tile\GeomType::POLYGON => Polygon::of(LineString::of(...$path)
-                    ->withSRID(WorldGeodeticProjection::SRID))->withSRID(WorldGeodeticProjection::SRID)
+                    ->withSRID(WebMercatorProjection::SRID))->withSRID(WebMercatorProjection::SRID)
             }, $paths);
-            $collection[] = new FeatureCollectionItem(count($geometry) > 1 ?
+            $source->add($layer->getName(), count($geometry) > 1 ?
                 $this->geometryCollectionFactory->get($geometry) : reset($geometry),
-                (object)array_merge($this->getValues($layer, $feature), ['id' => $feature->getId()]));
+                $this->getValues($layer, $feature), $position->getZoom(), $feature->getId());
         }
-        return new FeatureCollection(...$collection);
+        return $source->getLayer($layer->getName());
     }
 
     /**

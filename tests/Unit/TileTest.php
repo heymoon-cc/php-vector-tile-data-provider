@@ -8,12 +8,13 @@ use Brick\Geo\Exception\GeometryEngineException;
 use Brick\Geo\Exception\GeometryException;
 use Brick\Geo\Exception\InvalidGeometryException;
 use Brick\Geo\Exception\UnexpectedGeometryException;
-use Brick\Geo\IO\GeoJSON\FeatureCollection;
 use Brick\Geo\Point;
 use Brick\Geo\Polygon;
 use ErrorException;
 use Exception;
+use HeyMoon\VectorTileDataProvider\Entity\Layer;
 use HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection;
+use HeyMoon\VectorTileDataProvider\Spatial\WorldGeodeticProjection;
 use HeyMoon\VectorTileDataProvider\Tests\BaseTestCase;
 use HeyMoon\VectorTileDataProvider\Entity\TilePosition;
 use Vector_tile\Tile;
@@ -145,6 +146,8 @@ class TileTest extends BaseTestCase
      * @throws CoordinateSystemException
      * @throws InvalidGeometryException
      * @throws ErrorException
+     * @throws UnexpectedGeometryException
+     * @throws EmptyGeometryException
      * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::__construct
      * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::flipRow
      * @covers \HeyMoon\VectorTileDataProvider\Entity\TilePosition::getColumn
@@ -184,23 +187,42 @@ class TileTest extends BaseTestCase
      * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::latitudeToWGS84
      * @covers \HeyMoon\VectorTileDataProvider\Spatial\WebMercatorProjection::longitudeToWGS84
      * @covers \HeyMoon\VectorTileDataProvider\Service\TileService::decodeGeometry
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractLayer::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractLayer::add
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractLayer::addFeature
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractLayer::getFeatures
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractSource::add
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\AbstractSource::getLayer
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::__construct
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getGeometry
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getId
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getMinZoom
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Feature::getParameters
+     * @covers \HeyMoon\VectorTileDataProvider\Entity\Source::createLayer
+     * @covers \HeyMoon\VectorTileDataProvider\Factory\SourceFactory::create
+     * @covers \HeyMoon\VectorTileDataProvider\Service\SpatialService::transformLine
+     * @covers \HeyMoon\VectorTileDataProvider\Service\SpatialService::transformPolygon
      */
     public function testGeometryDecode()
     {
         $factory = $this->getTileFactory();
         $tile = $factory->parse($this->getFixture('tile.mvt'));
         $this->assertGreaterThanOrEqual(1, $tile->getLayers()->count());
+        $position = TilePosition::xyzFlip(619, 320, 10);
+        $spatialService = $this->getSpatialService();
         foreach ($tile->getLayers() as $layer) {
-            $collection = $this->getTileService()->decodeGeometry($layer, TilePosition::xyzFlip(619, 320, 10));
-            $this->assertInstanceOf(FeatureCollection::class, $collection);
+            $collection = $this->getTileService()->decodeGeometry($layer, $position);
+            $this->assertInstanceOf(Layer::class, $collection);
             $this->assertCount(44, $collection->getFeatures());
             foreach ($collection->getFeatures() as $feature) {
-                foreach (['id', 'NAME'] as $property) {
-                    $this->assertObjectHasProperty($property, $feature->getProperties());
-                }
+                $this->assertGreaterThan(1, $feature->getId());
+                $this->assertEquals($position->getZoom(), $feature->getMinZoom());
+                $this->assertArrayHasKey('NAME', $feature->getParameters());
                 $geometry = $feature->getGeometry();
                 $this->assertInstanceOf(Polygon::class, $geometry);
-                foreach ($geometry->rings() as $ring) {
+                $this->assertEquals(WebMercatorProjection::SRID, $geometry->SRID());
+                foreach ($spatialService->transformPolygon($geometry,
+                    WorldGeodeticProjection::SRID)->rings() as $ring) {
                     foreach ($ring->points() as $point) {
                         $this->assertEquals(37.0, floor($point->x()));
                         $this->assertEquals(55.0, floor($point->y()));
