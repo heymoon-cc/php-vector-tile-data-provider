@@ -281,7 +281,6 @@ class TileService implements TileServiceInterface
      * @param TilePosition $position
      * @return LayerInterface
      * @throws CoordinateSystemException
-     * @throws InvalidGeometryException
      * @throws ErrorException
      * @noinspection PhpMissingBreakStatementInspection
      */
@@ -350,12 +349,16 @@ class TileService implements TileServiceInterface
                     $command = null;
                 }
             }
-            $geometry = array_map(fn(array $path) => match ($feature->getType()) {
-                Tile\GeomType::POINT => reset($path),
-                Tile\GeomType::LINESTRING => LineString::of(...$path)->withSRID(WebMercatorProjection::SRID),
-                Tile\GeomType::POLYGON => Polygon::of(LineString::of(...$path)
-                    ->withSRID(WebMercatorProjection::SRID))->withSRID(WebMercatorProjection::SRID)
-            }, $paths);
+            try {
+                $geometry = array_map(fn(array $path) => match ($feature->getType()) {
+                    Tile\GeomType::POINT => reset($path),
+                    Tile\GeomType::LINESTRING => LineString::of(...$path)->withSRID(WebMercatorProjection::SRID),
+                    Tile\GeomType::POLYGON => Polygon::of(LineString::of(...$path)
+                        ->withSRID(WebMercatorProjection::SRID))->withSRID(WebMercatorProjection::SRID)
+                }, $paths);
+            } catch (InvalidGeometryException) {
+                continue;
+            }
             $source->add($layer->getName(), count($geometry) > 1 ?
                 $this->geometryCollectionFactory->get($geometry) : reset($geometry),
                 $this->getValues($layer, $feature), $position->getZoom(), $feature->getId());
@@ -411,7 +414,7 @@ class TileService implements TileServiceInterface
      * @throws UnexpectedGeometryException
      * @throws GeometryEngineException
      */
-    protected function simplify(AbstractLayer $layer, array $data, float $tolerance): array
+    protected function simplify(LayerInterface $layer, array $data, float $tolerance): array
     {
         /** @var Geometry[][] $shapeByParameters */
         $shapeByParameters = [];
