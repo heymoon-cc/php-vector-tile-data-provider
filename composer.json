@@ -44,7 +44,7 @@
             "protoc --proto_path=./proto --php_out=./proto/gen ./proto/vector_tile.proto"
         ],
         "test": [
-            "phpunit --log-junit=test-reports/tests.xml --coverage-cobertura=test-reports/coverage.xml --no-interaction"
+            "phpunit --log-junit=test-reports/tests.xml --coverage-clover=test-reports/clover.xml --no-interaction"
         ],
         "coverage": [
             "phpunit --coverage-cobertura=test-reports/coverage.xml --no-interaction"

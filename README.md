@@ -2,8 +2,8 @@
 [![Version](https://poser.pugx.org/heymoon/vector-tile-data-provider/v)](https://packagist.org/packages/heymoon/vector-tile-data-provider)
 [![PHP Version Require](https://poser.pugx.org/heymoon/vector-tile-data-provider/require/php)](https://packagist.org/packages/heymoon/vector-tile-data-provider)
 [![Test](https://github.com/heymoon-cc/php-vector-tile-data-provider/actions/workflows/test.yaml/badge.svg)](https://github.com/heymoon-cc/php-vector-tile-data-provider/actions/workflows/test.yaml)
-[![Maintainability](https://api.codeclimate.com/v1/badges/14e051ef07dc37acca40/maintainability)](https://codeclimate.com/github/heymoon-cc/php-vector-tile-data-provider/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/14e051ef07dc37acca40/test_coverage)](https://codeclimate.com/github/heymoon-cc/php-vector-tile-data-provider/test_coverage)
+[![Maintainability](https://qlty.sh/badges/810dfe02-6be3-4375-8d4a-db19daa43fb7/maintainability.svg)](https://qlty.sh/gh/heymoon-cc/projects/php-vector-tile-data-provider)
+[![Code Coverage](https://qlty.sh/badges/810dfe02-6be3-4375-8d4a-db19daa43fb7/test_coverage.svg)](https://qlty.sh/gh/heymoon-cc/projects/php-vector-tile-data-provider)
 
 Symfony + Redis demo: **<https://map.heymoon.cc>**
 ---

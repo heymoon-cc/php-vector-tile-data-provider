@@ -24,13 +24,10 @@ jobs:
         with:
           report_paths: test-reports/tests.xml
       - name: Upload coverage results
-        uses: paambaati/codeclimate-action@v8.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CodeClimateToken }}
+        uses: qltysh/qlty-action/coverage@v1
         with:
-          coverageLocations: |
-            ${{ github.workspace }}/test-reports/coverage.xml:cobertura
-          workingDirectory: ${{ github.workspace }}/src
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          files: test-reports/clover.xml
       - name: PHPMD
         run: make phpmd
       - run: make clean
