@@ -14,7 +14,7 @@ on:
       - ruleset.xml
 jobs:
   test:
-    runs-on: Linux
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v1
       - run: make composer
