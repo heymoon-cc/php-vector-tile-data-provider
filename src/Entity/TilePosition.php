@@ -12,6 +12,8 @@ use Stringable;
  */
 class TilePosition implements Stringable
 {
+    private $column;
+    private $row;
     private static array $registry = [];
     private ?float $tileWidth = null;
     private ?int  $gridSize = null;
@@ -21,10 +23,16 @@ class TilePosition implements Stringable
     private ?Point $maxPoint = null;
 
     private function __construct(
-        private readonly int $column,
-        private readonly int $row,
+        int $column,
+        int $row,
         private readonly int $zoom
-    ) {}
+    ) {
+        $size = $this->getGridSize();
+        $this->column = $column < 0 ? $size + $column :
+            ($column >= $size ? $column - $size : $column);
+        $this->row = $row < 0 ? $size + $row :
+            ($row >= $size ? $row - $size : $row);
+    }
 
     public function flipRow(): int
     {

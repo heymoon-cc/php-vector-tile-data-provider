@@ -22,6 +22,15 @@ composer: clean.container
 test: clean.container
 	docker run --name php-vector-tile-data-provider-tester -v $$(pwd):/code heymoon/php-vector-tile-data-provider-tester test
 
+test.podman:
+	podman build --cache-from=heymoon/php-vector-tile-data-provider-tester-builder --target builder \
+		-t docker.io/heymoon/php-vector-tile-data-provider-tester-builder tests/runtime
+	podman build --cache-from=heymoon/php-vector-tile-data-provider-tester-builder \
+ 		--cache-from=heymoon/php-vector-tile-data-provider-tester --target runtime \
+		-t docker.io/heymoon/php-vector-tile-data-provider-tester tests/runtime
+	podman run --rm --name php-vector-tile-data-provider-tester -v $$(pwd):/code \
+		docker.io/heymoon/php-vector-tile-data-provider-tester test
+
 coverage: clean.container
 	docker run --name php-vector-tile-data-provider-tester -v $$(pwd):/code heymoon/php-vector-tile-data-provider-tester coverage
 
