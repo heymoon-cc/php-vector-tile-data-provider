@@ -17,8 +17,8 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v1
-      - run: make composer
-      - run: make test
+      - run: make composer || make composer.podman
+      - run: make test || make test.podman
       - name: Upload test results
         uses: mikepenz/action-junit-report@v3
         with:

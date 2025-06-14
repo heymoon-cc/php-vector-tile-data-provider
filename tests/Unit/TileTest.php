@@ -360,5 +360,8 @@ class TileTest extends BaseTestCase
         $this->assertPoint(Point::xy(WebMercatorProjection::EARTH_RADIUS * -1, 0), $position->getMinPoint());
         $this->assertPoint(Point::xy(0, WebMercatorProjection::EARTH_RADIUS), $position->getMaxPoint());
         $this->assertEquals(2, TilePosition::clearRegistry());
+        $position = TilePosition::xyz(2, -1, 1);
+        $this->assertEquals(0, $position->getColumn());
+        $this->assertEquals(1, $position->getRow());
     }
 }
