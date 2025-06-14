@@ -29,5 +29,5 @@ jobs:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           files: test-reports/clover.xml
       - name: PHPMD
-        run: make phpmd
+        run: make phpmd || make phpmd.podman
       - run: make clean

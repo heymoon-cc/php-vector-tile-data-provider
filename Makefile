@@ -49,6 +49,11 @@ coverage: clean.container
 phpmd: clean.container
 	docker run --name php-vector-tile-data-provider-tester -v $$(pwd):/code heymoon/php-vector-tile-data-provider-tester phpmd
 
+phpmd.podman:
+	podman run --rm --name php-vector-tile-data-provider-tester \
+	--mount type=bind,source=$$(pwd),destination=/code,ro=false,relabel=private \
+	docker.io/heymoon/php-vector-tile-data-provider-tester phpmd
+
 clean.container:
 	docker rm php-vector-tile-data-provider-tester 2> /dev/null || true
 
