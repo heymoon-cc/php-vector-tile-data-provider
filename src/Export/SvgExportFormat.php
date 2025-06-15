@@ -27,7 +27,7 @@ class SvgExportFormat extends AbstractExportFormat
             foreach ($layer->getFeatures() as $feature) {
                 /** @var Tile\Feature $feature */
                 $values = $service->getValues($layer, $feature);
-                $stroke = $values['_debug_color'] ?? '#000000';
+                $stroke = $values['_debug_color'] ?? '#0000ff1a';
                 if (is_string($color)) {
                     $stroke = $values[$color] ?? $stroke;
                 } elseif (is_callable($color)) {
