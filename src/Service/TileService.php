@@ -102,11 +102,18 @@ class TileService implements TileServiceInterface
                          $data as $item) {
                 $shapes = $item->getGeometry();
                 foreach ($shapes instanceof GeometryCollection ? $shapes->geometries() : [$shapes] as $shape) {
-                    if (!$this->geometryEngine->contains($bufferedBounds, $shape)) {
-                        $intersection = $this->geometryEngine->intersection($shape, $bufferedBounds);
-                        $geometries = $intersection instanceof GeometryCollection ? $intersection->geometries() : [$intersection];
-                    } else {
-                        $geometries = [$shape];
+                    try {
+                        if (!$this->geometryEngine->contains($bufferedBounds, $shape)) {
+                            $intersection = $this->geometryEngine->intersection($shape, $bufferedBounds);
+                            $geometries = $intersection instanceof GeometryCollection ? $intersection->geometries() : [$intersection];
+                        } else {
+                            $geometries = [$shape];
+                        }
+                    } catch (GeometryEngineException $e) {
+                        if ($e->getPrevious() === null) {
+                            throw $e;
+                        }
+                        continue;
                     }
                     foreach ($geometries as $geometry) {
                         $feature = new Tile\Feature();
