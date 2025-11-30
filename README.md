@@ -4,6 +4,7 @@
 [![Test](https://github.com/heymoon-cc/php-vector-tile-data-provider/actions/workflows/test.yaml/badge.svg)](https://github.com/heymoon-cc/php-vector-tile-data-provider/actions/workflows/test.yaml)
 [![Maintainability](https://qlty.sh/badges/810dfe02-6be3-4375-8d4a-db19daa43fb7/maintainability.svg)](https://qlty.sh/gh/heymoon-cc/projects/php-vector-tile-data-provider)
 [![Code Coverage](https://qlty.sh/badges/810dfe02-6be3-4375-8d4a-db19daa43fb7/test_coverage.svg)](https://qlty.sh/gh/heymoon-cc/projects/php-vector-tile-data-provider)
+[![Matrix](https://img.shields.io/matrix/php-vector-tile-data-provider%3Aheymoon.cc?fetchMode=guest)](https://matrix.to/#/#php-vector-tile-data-provider:heymoon.cc)
 
 Symfony + Redis demo: **<https://map.heymoon.cc>**
 ---
