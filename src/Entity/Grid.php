@@ -9,7 +9,7 @@ class Grid
 {
     public function __construct(
         private readonly int $zoom,
-        private readonly array $data
+        private array $data
     ) {}
 
     /**
@@ -18,7 +18,7 @@ class Grid
      */
     public function iterate(callable $callback): self
     {
-        foreach ($this->data as $key => $item) {
+        foreach ($this->data as $key => &$item) {
             $callback(TilePosition::key($key, $this->zoom), $item);
         }
         return $this;
