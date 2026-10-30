@@ -61,19 +61,25 @@ You must explicitly generate protobuf classes from your project root:
 `protoc --proto_path=./vendor/heymoon/vector-tile-data-provider/proto --php_out=./vendor/heymoon/vector-tile-data-provider/proto/gen ./vendor/heymoon/vector-tile-data-provider/proto/vector_tile.proto`
 
 Install `php-geos` and `php-protobuf` extensions for best performance. Example Dockerfile for
-[Alpine 3.16 with PHP 8.1](https://hub.docker.com/layers/library/php/8.1-alpine3.16/images/sha256-298daac152760e2510ff283b0785c8feef72a2b134b27af918a80e40f26c1bb8):
+[Alpine 3.24 with PHP 8.5.12](https://hub.docker.com/layers/library/php/8.5.12-fpm-alpine3.24/images/sha256-a8e00978f4222e1c32bf4f2062d048f00313c36967b5659fc77096c9f9c1b06f) (with [php2shell](https://en.wikipedia.org/wiki/PHP2Shell) patched):
 ```Dockerfile
-FROM php:8.1-alpine3.16
+FROM php:8.5.12-fpm-alpine3.24 AS builder
 RUN apk add --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
-    geos-dev \
-    git
-RUN apk add --no-cache protoc geos
-RUN pecl install protobuf \
-    && docker-php-ext-enable protobuf \
-	&& git clone https://git.osgeo.org/gitea/geos/php-geos.git /usr/src/php/ext/geos && cd /usr/src/php/ext/geos && \
-	./autogen.sh && ./configure && make && \
-	echo "extension=/usr/src/php/ext/geos/modules/geos.so" > /usr/local/etc/php/conf.d/docker-php-ext-geos.ini
+    git cmake
+RUN apk add --no-cache protoc
+RUN wget https://download.osgeo.org/geos/geos-3.13.1.tar.bz2 -O /usr/src/geos.tar.bz2 && cd /usr/src/ && \
+    tar xvfj geos.tar.bz2 && rm -f geos.tar.bz2 && cd geos-3.13.1 && cmake \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/usr/local \
+      -DBUILD_TESTING=OFF && \
+    make && make install && \
+    cp -r /usr/src/geos-3.13.1/include/geos* /usr/include/ && rm -rf /usr/src/geos-3.13.1
+RUN git clone https://git.osgeo.org/gitea/geos/php-geos.git /usr/src/php/ext/geos && cd /usr/src/php/ext/geos && \
+    ./autogen.sh && ./configure && make && \
+    mv /usr/src/php/ext/geos/modules/geos.so /usr/local/lib/php/extensions/no-debug-non-zts-20250925/geos.so && \
+    pecl install protobuf \
+    && docker-php-ext-enable protobuf geos
 RUN apk del -f .build-deps && rm -rf /tmp/* /var/cache/apk/*
 # run "composer install" and then...
 RUN protoc --proto_path=./vendor/heymoon/vector-tile-data-provider/proto --php_out=./vendor/heymoon/vector-tile-data-provider/proto/gen ./vendor/heymoon/vector-tile-data-provider/proto/vector_tile.proto
