@@ -8,8 +8,8 @@ RUN wget https://download.osgeo.org/geos/geos-3.13.1.tar.bz2 -O /usr/src/geos.ta
     tar xvfj geos.tar.bz2 && rm -f geos.tar.bz2 && cd geos-3.13.1 && cmake \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=/usr/local \
-      -DBUILD_TESTING=OFF && \
-    make && make install && \
+      -DBUILD_TESTING=ON && \
+    make && make test && make install && \
     cp -r /usr/src/geos-3.13.1/include/geos* /usr/include/ && rm -rf /usr/src/geos-3.13.1
 RUN git clone https://git.osgeo.org/gitea/geos/php-geos.git /usr/src/php/ext/geos && cd /usr/src/php/ext/geos && \
     ./autogen.sh && ./configure && make && \
