@@ -61,7 +61,7 @@ You must explicitly generate protobuf classes from your project root:
 `protoc --proto_path=./vendor/heymoon/vector-tile-data-provider/proto --php_out=./vendor/heymoon/vector-tile-data-provider/proto/gen ./vendor/heymoon/vector-tile-data-provider/proto/vector_tile.proto`
 
 Install `php-geos` and `php-protobuf` extensions for best performance. Example Dockerfile for
-[Alpine 3.24 with PHP 8.5.12](https://hub.docker.com/layers/library/php/8.5.12-fpm-alpine3.24/images/sha256-a8e00978f4222e1c32bf4f2062d048f00313c36967b5659fc77096c9f9c1b06f) (with [php2shell](https://en.wikipedia.org/wiki/PHP2Shell) patched):
+[Alpine 3.24 with PHP 8.5.12](https://hub.docker.com/layers/library/php/8.5.12-fpm-alpine3.24/images/sha256-a8e00978f4222e1c32bf4f2062d048f00313c36967b5659fc77096c9f9c1b06f) ([php2shell](https://en.wikipedia.org/wiki/PHP2Shell) patched):
 ```Dockerfile
 FROM php:8.5.12-fpm-alpine3.24 AS builder
 RUN apk add --no-cache --virtual .build-deps \
